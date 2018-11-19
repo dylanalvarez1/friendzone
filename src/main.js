@@ -10,12 +10,12 @@ Vue.config.productionTip = false
 // Initialize Firebase
 let app;
 var config = {
-  apiKey: "AIzaSyAyfUqqoHVR-wHgS4DL9_M_3IaOIw5wJ3g",
-  authDomain: "friendzone-3ffa2.firebaseapp.com",
-  databaseURL: "https://friendzone-3ffa2.firebaseio.com",
-  projectId: "friendzone-3ffa2",
-  storageBucket: "friendzone-3ffa2.appspot.com",
-  messagingSenderId: "97024283244"
+  apiKey: "AIzaSyBgk6vasRQOAdt_mX3qVfQUWy9JOQwu_FM",
+  authDomain: "friendzone-4930.firebaseapp.com",
+  databaseURL: "https://friendzone-4930.firebaseio.com",
+  projectId: "friendzone-4930",
+  storageBucket: "friendzone-4930.appspot.com",
+  messagingSenderId: "437470176183"
 };
 
 firebase.initializeApp(config);

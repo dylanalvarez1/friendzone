@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div class="registration">
     <h3>Let's create a new account</h3>
     <input type="text" v-model="email" placeholder="Email"><br>
     <input type="password" v-model="password" placeholder="Password"><br>
@@ -35,7 +35,7 @@ import firebase from 'firebase'
 </script>
 
 <style scoped>
-.login {
+.registration {
   margin-top: 40px;
 }
  input {
