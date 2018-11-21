@@ -1,5 +1,5 @@
 <template>
-<h1>TODO: This is /home</h1>
+<h1>TODO: This is /search</h1>
 </template>
 
 <script>
@@ -7,7 +7,7 @@ import firebase from 'firebase'
 
 
 export default {
-  name: 'Home',
+  name: 'Search',
   data () {
     return {
     }

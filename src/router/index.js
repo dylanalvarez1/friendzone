@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import About from '@/components/About'
 import HelloWorld from '@/components/HelloWorld'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
+import Search from '@/components/Search'
 import SignUp from '@/components/SignUp'
 import firebase from 'firebase'
 Vue.use(Router)
@@ -42,6 +44,22 @@ let router = new Router({
       path: '/sign-up',
       name: 'SignUp',
       component: SignUp
+    },
+    {
+      path: '/search',
+      name: 'Search',
+      component: Search,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/about',
+      name: 'About',
+      component: About,
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
 })
