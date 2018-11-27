@@ -23,7 +23,7 @@ import firebase from 'firebase'
       signIn: function() {
         firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
           (user) => {
-            this.$router.replace('home');
+            this.$router.replace('hello');
           },
           (err) => {
             alert('Oops. ' + err.message);
