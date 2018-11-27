@@ -35,6 +35,11 @@ let router = new Router({
       path: '/sign-up',
       name: 'SignUp',
       component: SignUp
+    },
+    {
+      path: '/home',
+      name: 'home',
+      component: HelloWorld
     }
   ]
 })
@@ -46,7 +51,7 @@ router.beforeEach((to, from, next) => {
   let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
   if(requiresAuth && !currentUser) next('login');
-  else if (!requiresAuth && currentUser) next('hello');
+  //else if (!requiresAuth && currentUser) next('hello');  <- This might cause security issues if gone, not sure, but for now leave commented so we can go to other routes
   else next();
 })
 

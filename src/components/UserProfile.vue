@@ -1,9 +1,10 @@
 <template>
 <div>
   <ul>
+    <li style="float:right" @click="logout"><a>Logout</a></li>
     <li style="float:right"><a href="#home">Search</a></li>
-    <li style="float:right"><a href="#news">About</a></li>
-    <li style="float:right"><a href="#contact">Home</a></li>
+    <li style="float:right"><a href="#hello">About</a></li>
+    <li style="float:right" @click="toHome"><a>Home</a></li>
   </ul>
   <div class="grid-container">
     <div class="grid-item item1">
@@ -76,7 +77,17 @@ import firebase from 'firebase'
       },
       goToRoom: function(name) {
         alert("Now entering " + name + "'s room");
+      },
+      logout: function() {
+        firebase.auth().signOut().then(()=> {
+          this.$router.replace('login');
+        });
+      },
+      toHome: function() {
+        console.log("To home!");
+        this.$router.replace('home');
       }
+
     },
     mounted: function() {
       let friend1 = {"name": "friend1", "id": 1, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
