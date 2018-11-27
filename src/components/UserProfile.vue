@@ -1,29 +1,53 @@
 <template>
- <div class="profile">
-   <h2>{{this.username}}</h2>
-   <p>{{this.uid}}</p>
-   <img src="../assets/logo.png"><br>
-   <div><p id="friendLabel">Friends:</p>
-        <div id="friendList" v-for="friend in friends" :key="friend.name" class="container" @click="goToUserPage(friend.name)">
-          <img id="friendIcon" :src="friend.url" alt="Avatar" class="image friendPic" style="width:100%">
-          <div class="middle iconLabel">
-            <div id="iconLabel" class="text">
-              {{friend.name}}
+<div>
+  <ul>
+    <li style="float:right"><a href="#home">Search</a></li>
+    <li style="float:right"><a href="#news">About</a></li>
+    <li style="float:right"><a href="#contact">Home</a></li>
+  </ul>
+  <div class="grid-container">
+    <div class="grid-item item1">
+      <div @click="followUser(username)">
+        <img src="../assets/logo.png" style="width: 50px; height: 50px"/>
+        <p>Follow</p>
+      </div>
+    </div>
+    <div class="grid-item item4">
+      <div @click="goToRoom(username)">
+        <img src="../assets/logo.png" style="width: 50px; height: 50px;"/>
+        <p>Go to room</p>
+      </div>
+    </div>
+    <div class="grid-item item2">
+      <h2>{{this.username}}</h2>
+      <p>{{this.uid}}</p>
+      <img src="../assets/logo.png"/><br>
+    </div>
+    <div class="grid-item item3">
+      <div><p id="friendLabel">Friends:</p>
+          <div id="friendList" v-for="friend in friends" :key="friend.name" class="container" @click="goToUserPage(friend.name)">
+            <img id="friendIcon" :src="friend.url" alt="Avatar" class="image friendPic" style="width:100%">
+            <div class="middle iconLabel">
+              <div id="iconLabel" class="text">
+                {{friend.name}}
+              </div>
             </div>
           </div>
-        </div>
-   </div>
-   <div><p id="groupLabel">Groups:</p>
-        <div id="groupList" v-for="group in groups" :key="group.name" class="container" @click="goToGroupPage(group.name)">
-          <img id="groupIcon" :src="group.url" alt="Avatar" class="image groupPic" style="width:100%">
-          <div class="middle iconLabel">
-            <div id="iconLabel" class="text">
-              {{group.name}}
+      </div>
+      <div><p id="groupLabel">Groups:</p>
+          <div id="groupList" v-for="group in groups" :key="group.name" class="container" @click="goToGroupPage(group.name)">
+            <img id="groupIcon" :src="group.url" alt="Avatar" class="image groupPic" style="width:100%">
+            <div class="middle iconLabel">
+              <div id="iconLabel" class="text">
+                {{group.name}}
+              </div>
             </div>
           </div>
-        </div>
-   </div>
- </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </template>
 
 <script>
@@ -46,6 +70,12 @@ import firebase from 'firebase'
       },
       goToGroupPage: function(name) {
         alert(name);
+      },
+      followUser: function(name) {
+        alert("Follow " + name + "?");
+      },
+      goToRoom: function(name) {
+        alert("Now entering " + name + "'s room");
       }
     },
     mounted: function() {
@@ -142,5 +172,88 @@ import firebase from 'firebase'
   display: inline-block;
   margin-right: 5px;
 }
+
+#menuIcon1 {
+   display: inline-block;
+    vertical-align: middle;
+}
+
+#menuIcon2 {
+  display: inline-block;
+    vertical-align: middle;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
+}
+
+li {
+    float: left;
+    border-right: 1px solid #bbb;
+}
+
+li:first-child {
+    border-right: none;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover:not(.active) {
+    background-color: #111;
+}
+
+.active {
+    background-color: #4CAF50;
+}
+
+
+.grid-container {
+  display: grid;
+  grid-gap: 10px;
+  background-color: #2196F3;
+  padding: 10px;
+  align-content: center;
+
+}
+.grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 20px;
+  font-size: 30px;
+}
+.item1 {
+  grid-column: 1;
+  grid-row: 1;
+  vertical-align: middle !important;
+}
+.item2 {
+  grid-column: 2 / span 3;
+  grid-row: 1 / span 2;
+
+}
+.item3 {
+  grid-column: 1 / span 4;
+  grid-row: 3;
+  text-align: left !important;
+}
+.item4 {
+  grid-column: 1;
+  grid-row: 2;
+  vertical-align: middle !important;
+}
+
 
 </style>
