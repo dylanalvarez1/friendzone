@@ -56,4 +56,12 @@ import firebase from 'firebase'
    text-decoration: underline;
    cursor: pointer;
  }
+
+ .registration {
+   text-align: center;
+   padding: 50px;
+   margin: 250px;
+   background-color: skyblue;
+    border-radius: 5px;
+  }
 </style>
