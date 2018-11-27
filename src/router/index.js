@@ -3,7 +3,9 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
+import UserProfile from '@/components/UserProfile'
 import firebase from 'firebase'
+
 Vue.use(Router)
 
 let router = new Router({
@@ -19,7 +21,7 @@ let router = new Router({
     {
       path: '/hello',
       name: 'HelloWorld',
-      component: HelloWorld,
+      component: UserProfile,
       meta: {
         requiresAuth: true
       }
@@ -33,6 +35,11 @@ let router = new Router({
       path: '/sign-up',
       name: 'SignUp',
       component: SignUp
+    },
+    {
+      path: '/home',
+      name: 'home',
+      component: HelloWorld
     }
   ]
 })
@@ -44,7 +51,7 @@ router.beforeEach((to, from, next) => {
   let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
   if(requiresAuth && !currentUser) next('login');
-  else if (!requiresAuth && currentUser) next('hello');
+  //else if (!requiresAuth && currentUser) next('hello');  <- This might cause security issues if gone, not sure, but for now leave commented so we can go to other routes
   else next();
 })
 

@@ -1,9 +1,9 @@
 <template>
   <div class="login">
-    <h3> Sign in </h3>
+    <h3> Sign In </h3>
     <input type="text" v-model="email" placeholder="Email"><br>
     <input type="password" v-model="password" placeholder="Password"><br>
-    <button v-on:click="signIn">Connection</button>
+    <button v-on:click="signIn">Log in</button>
     <p>You don't have an account? <router-link to="/sign-up">You can create one</router-link></p>
   </div>
 </template>
@@ -56,4 +56,12 @@ import firebase from 'firebase'
    text-decoration: underline;
    cursor: pointer;
  }
+
+ .login {
+   text-align: center;
+   padding: 50px;
+   margin: 250px;
+   background-color: skyblue;
+   border-radius: 5px;
+  }
 </style>
