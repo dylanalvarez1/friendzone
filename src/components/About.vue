@@ -1,5 +1,8 @@
 <template>
+  <div>
 <h1>TODO: This is /about</h1>
+<h3>{{user}}</h3>
+</div>
 </template>
 
 <script>
@@ -10,6 +13,7 @@ export default {
   name: 'About',
   data () {
     return {
+      user: firebase.auth().currentUser
     }
   },
   methods: {

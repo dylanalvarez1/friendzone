@@ -1,0 +1,29 @@
+{
+  "uid": "s7skfZneO0aT34jCsMPVfDTYAPp2",
+  "displayName": "dpws",
+  "photoURL": null,
+  "email": "azvasquez99@gmail.com",
+  "emailVerified": false,
+  "phoneNumber": null,
+  "isAnonymous": false,
+  "providerData": [{
+    "uid": "azvasquez99@gmail.com",
+    "displayName": "dpws",
+    "photoURL": null,
+    "email": "azvasquez99@gmail.com",
+    "phoneNumber": null,
+    "providerId": "password"
+  }],
+  "apiKey": "AIzaSyBgk6vasRQOAdt_mX3qVfQUWy9JOQwu_FM",
+  "appName": "[DEFAULT]",
+  "authDomain": "friendzone-4930.firebaseapp.com",
+  "stsTokenManager": {
+    "apiKey": "AIzaSyBgk6vasRQOAdt_mX3qVfQUWy9JOQwu_FM",
+    "refreshToken": "AEXAG-ceTF-njFoLnxJpdTb8Kqb_bY3YgDj0qnz_D9XXw1Nh_yIQGbOEMuIwZVY7La6tFLRKgZ34z1DPwqLd6L3Gjc4gDdvJVxROFvtTLH2Zbn86i3SI5Bx_9ltcEL_fOFzJ_ccIYkD0tVu5KW_sSmcnrt3leKyB9Xu0d-T_RDJiQtLuSXlkE2oQRN0G7fQKfHggbxEgEc86lEV-97eRdQ1pr0cBXf5ebQ",
+    "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjM1OWJjZGNmZTY2MmQzZjFjMDlkZTFjYmEzMGQ5OWY3ZjRmOThkNjkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZnJpZW5kem9uZS00OTMwIiwibmFtZSI6ImRwd3MiLCJhdWQiOiJmcmllbmR6b25lLTQ5MzAiLCJhdXRoX3RpbWUiOjE1NDI4MjEzNTcsInVzZXJfaWQiOiJzN3NrZlpuZU8wYVQzNGpDc01QVmZEVFlBUHAyIiwic3ViIjoiczdza2ZabmVPMGFUMzRqQ3NNUFZmRFRZQVBwMiIsImlhdCI6MTU0MjgzNjM4NCwiZXhwIjoxNTQyODM5OTg0LCJlbWFpbCI6ImF6dmFzcXVlejk5QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJhenZhc3F1ZXo5OUBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.LPCrZgrikQ0gCtFhs-MLhzAj78ltQvyvmFSRiQ1Ql-NX-WV847S9FagT6lST774G3pCt5qhkuuCx2i2sqXkVqkW17Rf_hXXmhEdKiw5deMFU_-h8Gpy_dYI-Qdo8Y6xkncKrJVZJIdiEjM8zo5ZrC8x3OM9-NMjCIsJGvYL5MWB6W5BZ9KFnjOCDjqRqNhW1nSt0qUg-IK-dHpoIFi0sfWk4uxOCs7f-n3lh5S435Paw66goILVJNqXQtu89FpCEcyB3A-3RK3StJJviWc897rrIi_quAJTkvJA7XigAfy8WKJRSRJLE0WwRCvW1p0vFrECkPUd8rG9Zea4SR8zt8w",
+    "expirationTime": 1542839985295
+  },
+  "redirectEventId": null,
+  "lastLoginAt": "1542821357000",
+  "createdAt": "1542663159000"
+}
