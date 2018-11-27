@@ -25,14 +25,6 @@ let router = new Router({
       }
     },
     {
-      path: '/home',
-      name: 'Home',
-      component: Home,
-      meta: {
-        requiresAuth: true
-      }
-    },
-    {
       path: '/login',
       name: 'Login',
       component: Login
@@ -41,22 +33,6 @@ let router = new Router({
       path: '/sign-up',
       name: 'SignUp',
       component: SignUp
-    },
-    {
-      path: '/search',
-      name: 'Search',
-      component: Search,
-      meta: {
-        requiresAuth: true
-      }
-    },
-    {
-      path: '/about',
-      name: 'About',
-      component: About,
-      meta: {
-        requiresAuth: true
-      }
     }
   ]
 })
