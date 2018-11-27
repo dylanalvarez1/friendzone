@@ -4,7 +4,7 @@
    <p>{{this.uid}}</p>
    <img src="../assets/logo.png"><br>
    <span><p id="friendLabel">Friends:</p>
-        <div id="friendList" v-for="friend in friends" :key="friend.name" class="container">
+        <div id="friendList" v-for="friend in friends" :key="friend.name" class="container" @click="goToUserPage(friend.name)">
           <img id="friendIcon" :src="friend.url" alt="Avatar" class="image friendPic" style="width:100%">
           <div class="middle iconLabel">
             <div id="iconLabel" class="text">
@@ -30,7 +30,9 @@ import firebase from 'firebase'
       }
     },
     methods: {
-
+      goToUserPage: function(name) {
+        alert(name);
+      }
     },
     mounted: function() {
       let friend1 = {"name": "friend1", "id": 1, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
