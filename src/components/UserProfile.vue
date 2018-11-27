@@ -1,11 +1,5 @@
 <template>
 <div>
-  <ul>
-    <li style="float:right" @click="logout"><a>Logout</a></li>
-    <li style="float:right"><a href="#home">Search</a></li>
-    <li style="float:right"><a href="#hello">About</a></li>
-    <li style="float:right" @click="toHome"><a>Home</a></li>
-  </ul>
   <div class="grid-container">
     <div class="grid-item item1">
       <div @click="followUser(username)">
@@ -78,15 +72,6 @@ import firebase from 'firebase'
       goToRoom: function(name) {
         alert("Now entering " + name + "'s room");
       },
-      logout: function() {
-        firebase.auth().signOut().then(()=> {
-          this.$router.replace('login');
-        });
-      },
-      toHome: function() {
-        console.log("To home!");
-        this.$router.replace('home');
-      }
 
     },
     mounted: function() {
@@ -103,13 +88,13 @@ import firebase from 'firebase'
       let group5 = {"name": "group5", "id": 5, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
 
       let currentUser = firebase.auth().currentUser;
-      console.log(currentUser);
+      //console.log(currentUser);
       this.username = currentUser.email;
       this.uid = currentUser.uid;
       this.friends = new Array(friend1, friend2, friend3, friend4, friend5);
-      this.friends.forEach(friend => console.log(friend.name));
+      //this.friends.forEach(friend => console.log(friend.name));
       this.groups = new Array(group1, group2, group3, group4, group5);
-      this.groups.forEach(group => console.log(group.name));
+      //this.groups.forEach(group => console.log(group.name));
     }
   }
 </script>

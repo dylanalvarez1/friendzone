@@ -1,12 +1,29 @@
 <template>
   <div id="app">
-    <router-view/>
+    <NavBar v-if="user" @loggedIn="login"></NavBar>
+    <router-view @loggedIn="login" />
   </div>
 </template>
 
 <script>
+import NavBar from './components/NavBar.vue'
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    NavBar
+  },
+  data: function() {
+      return {
+       user : false,
+      }
+    },
+  methods: {
+    login: function(bool) {
+      console.log("In logged in");
+      this.user = bool;
+    }
+  },
+
 }
 </script>
 
