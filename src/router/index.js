@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import GroupRegistration from '@/components/GroupRegistration'
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
@@ -40,6 +41,14 @@ let router = new Router({
       path: '/home',
       name: 'home',
       component: HelloWorld
+    },
+    {
+      path: '/group-registration',
+      name: 'Group Registration',
+      component: GroupRegistration,
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
 })
