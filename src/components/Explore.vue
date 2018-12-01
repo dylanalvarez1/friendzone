@@ -2,7 +2,7 @@
   <div id="background">
 
     <div class="container" style="display: inline; float: left; width: 100%; margin-top: 50px;">
-      <button>Register a new group</button>
+      <button @click="$router.replace('group-registration')">Register a new group</button>
       <input placeholder="Search" style=""></input>
       <select style="">
         <option value="none">No filter</option>
