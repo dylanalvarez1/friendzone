@@ -2,26 +2,26 @@
 <div>
   <div class="grid-container">
     <div class="grid-item item1">
-      <div @click="followUser(username)">
+      <div @click="followUser(user.displayName)">
         <img src="../assets/logo.png" style="width: 50px; height: 50px"/>
         <p>Follow</p>
       </div>
     </div>
     <div class="grid-item item4">
-      <div @click="goToRoom(username)">
+      <div @click="goToRoom(user.displayName)">
         <img src="../assets/logo.png" style="width: 50px; height: 50px;"/>
         <p>Go to room</p>
       </div>
     </div>
     <div class="grid-item item2">
-      <h2>{{this.username}}</h2>
-      <p>{{this.uid}}</p>
-      <img src="../assets/logo.png"/><br>
+      <h2>{{this.user.displayName}}</h2>
+      <p>{{this.user.email}}</p>
+      <img :src="user.photoURL" /><br>
     </div>
     <div class="grid-item item3">
       <div><p id="friendLabel">Friends:</p>
-          <div id="friendList" v-for="friend in friends" :key="friend.name" class="container" @click="goToUserPage(friend.name)">
-            <Icon :url="friend.url" :label="friend.name"></Icon>
+          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToUserPage(friend.uid)">
+            <Icon :url="friend.photoURL" :label="friend.displayName"></Icon>
           </div>
       </div>
       <div><p id="groupLabel">Groups:</p>
@@ -42,13 +42,17 @@ import Icon from '@/components/Icon'
     name: 'login',
     data: function() {
       return {
-        username: "",
-        uid: "",
-        friends: undefined,
-        groups: undefined
+       user : {
+         "photoURL": "",
+         "displayName": "",
+         "email": "",
+         "friends": []
+       },
+       friends: []
 
       }
     },
+    props: ['username'],
     components: {
       Icon,
     },
@@ -68,7 +72,7 @@ import Icon from '@/components/Icon'
 
     },
     mounted: function() {
-      let friend1 = {"name": "friend1", "id": 1, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
+     /*  let friend1 = {"name": "friend1", "id": 1, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
       let friend2 = {"name": "friend2", "id": 2, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
       let friend3 = {"name": "friend3", "id": 3, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
       let friend4 = {"name": "friend4", "id": 4, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
@@ -79,15 +83,31 @@ import Icon from '@/components/Icon'
       let group3 = {"name": "group3", "id": 3, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
       let group4 = {"name": "group4", "id": 4, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
       let group5 = {"name": "group5", "id": 5, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
+      */
 
-      let currentUser = firebase.auth().currentUser;
-      //console.log(currentUser);
-      this.username = currentUser.email;
-      this.uid = currentUser.uid;
-      this.friends = new Array(friend1, friend2, friend3, friend4, friend5);
-      //this.friends.forEach(friend => console.log(friend.name));
-      this.groups = new Array(group1, group2, group3, group4, group5);
-      //this.groups.forEach(group => console.log(group.name));
+     console.log("props: " + this.username);
+
+      const userId = firebase.auth().currentUser.email.replace(".","");
+
+      firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
+        this.user = snapshot.val();
+        //console.log(this.user);
+        console.log(this.user.friends);
+
+      }).then(() => {
+          let i = 0;
+          this.user.friends.forEach(friend => {
+            let tempId = friend.replace(".","");
+            firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
+            this.friends[i++] = snapshot.val();
+
+            });
+
+          });
+      });
+
+    console.log("my full friends profile array:", this.friends);
+
     }
   }
 </script>

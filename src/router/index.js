@@ -28,7 +28,10 @@ let router = new Router({
       component: UserProfile,
       meta: {
         requiresAuth: true
-      }
+      },
+      props: (route) => ({
+        username: route.query.username,
+      })
     },
     {
       path: '/login',
