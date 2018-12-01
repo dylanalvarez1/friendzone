@@ -126,6 +126,6 @@
   }
 
   .register-input {
-    color: #ff7895;
+    color: black;
   }
 </style>
