@@ -29,7 +29,7 @@
         </div>
         <br><br><br>
       </form>
-      <button type="submit" class="btn btn-warning">Sign Up</button>
+      <button type="submit" class="btn btn-primary">Sign Up</button>
       <br><br><br>
       <span style="color: black">Or go back to <router-link to="/login">login</router-link></span>
       <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -73,7 +73,7 @@
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
   }
 
-  .btn-warning {
+  .btn-primary {
     background-color: black;
   }
 
@@ -100,14 +100,14 @@
   }
 
   input[type="password"]::-moz-placeholder {
-    color: #ff7895 !important;
+    color: black !important;
   }
 
   input[type="text"]:-ms-input-placeholder {
-    color: #ff7895 !important;
+    color: black !important;
   }
 
   .register-input {
-    color: #ff7895;
+    color: black;
   }
 </style>

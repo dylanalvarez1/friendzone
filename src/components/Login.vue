@@ -31,7 +31,7 @@
       </form>
       <button
         type="submit"
-        class="btn btn-default"
+        class="btn btn-primary"
         v-on:click="signIn" style="color: black">Log In</button>
       <br><br><br>
       <p style="color: white">You don't have an account?
@@ -105,14 +105,14 @@
   }
 
   input[type="password"]::-moz-placeholder {
-    color: #ff7895 !important;
+    color: white !important;
   }
 
   input[type="password"]:-ms-input-placeholder {
-    color: #ff7895 !important;
+    color: white !important;
   }
 
   .register-input {
-    color: #ff7895;
+    color: white;
   }
 </style>
