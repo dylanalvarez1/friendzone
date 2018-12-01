@@ -22,8 +22,8 @@ let router = new Router({
       redirect: '/login'
     },
     {
-      path: '/hello',
-      name: 'HelloWorld',
+      path: '/home',
+      name: 'Home',
       component: UserProfile,
       meta: {
         requiresAuth: true
@@ -38,11 +38,6 @@ let router = new Router({
       path: '/sign-up',
       name: 'SignUp',
       component: SignUp
-    },
-    {
-      path: '/home',
-      name: 'home',
-      component: HelloWorld
     },
     {
       path: '/group-registration',
@@ -66,12 +61,14 @@ let router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  let currentUser = firebase.auth().currentUser;
 
-  //we use .some() in case there are nested routes
+  let currentUser = firebase.auth().currentUser;
   let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
+  //we use .some() in case there are nested routes
+
   if(requiresAuth && !currentUser) next('login');
+   else if(!requiresAuth&&currentUser) next('home');
   else next();
 })
 

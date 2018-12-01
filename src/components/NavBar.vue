@@ -3,7 +3,7 @@
    <ul>
     <li style="float:right" @click="logout"><a>Logout</a></li>
     <li style="float:right" @click="toGroup"><a>Search</a></li>
-    <li style="float:right" @click="toProfile"><a href="#hello">Profile</a></li>
+    <li style="float:right" @click="toProfile"><a href="#home">Profile</a></li>
     <li style="float:right" @click="toRoom"><a>My Room</a></li>
   </ul>
 </div>
@@ -28,7 +28,7 @@ import firebase from 'firebase'
       },
       toProfile: function() {
         console.log("To home!");
-        this.$router.replace('hello');
+        this.$router.replace('home');
       },
       toRoom: function() {
         console.log("To home!");
