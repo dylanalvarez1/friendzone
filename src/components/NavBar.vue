@@ -32,7 +32,7 @@ import firebase from 'firebase'
       },
       toRoom: function() {
         console.log("To home!");
-        this.$router.push({ path: `/room/` });
+        this.$router.push({ path: `/room/test@memecom` });
       },
       toExplore: function() {
         console.log("To explore!");
