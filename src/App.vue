@@ -1,8 +1,8 @@
 <template>
-    <div id="app">
-      <NavBar v-if="user" @loggedIn="login"></NavBar>
-      <router-view @loggedIn="login" />
-    </div>
+  <div id="app">
+    <NavBar v-if="user" @loggedIn="login"></NavBar>
+    <router-view @loggedIn="login" />
+  </div>
 </template>
 
 <script>

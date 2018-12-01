@@ -42,6 +42,33 @@
   </body>
 </template>
 
+<script>
+  import firebase from 'firebase'
+
+  export default {
+    name: 'login',
+    data: function () {
+      return {
+        email: '',
+        password: ''
+      }
+    },
+    methods: {
+      signIn: function () {
+        firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
+          (user) => {
+            this.$emit("loggedIn", true);
+            this.$router.replace('hello');
+          },
+          (err) => {
+            alert('Oops. ' + err.message);
+          }
+        )
+      }
+    }
+  }
+</script>
+
 <style scoped>
   h2 {
     text-align: center;
@@ -87,32 +114,3 @@
     color: #ff7895;
   }
 </style>
-
-<script>
-  import firebase from 'firebase'
-
-  export default {
-    name: 'login',
-    data: function () {
-      return {
-        email: '',
-        password: ''
-      }
-    },
-    methods: {
-      signIn: function () {
-        firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
-          (user) => {
-            this.$emit("loggedIn", true);
-            this.$router.replace('hello');
-          },
-          (err) => {
-            alert('Oops. ' + err.message);
-          }
-        )
-      }
-    }
-  }
-</script>
-
-

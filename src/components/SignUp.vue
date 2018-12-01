@@ -40,6 +40,32 @@
   </body>
 </template>
 
+<script>
+  import firebase from 'firebase'
+
+  export default {
+    name: 'signUp',
+    data: function () {
+      return {
+        email: '',
+        password: ''
+      }
+    },
+    methods: {
+      signUp: function () {
+        firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
+          (user) => {
+            this.$emit("loggedIn", true);
+            this.$router.replace('hello');
+          },
+          (err) => {
+            alert('Oops. ' + err.message);
+          }
+        );
+      }
+    }
+  }
+</script>
 
 <style scoped>
   h2 {
@@ -86,31 +112,3 @@
     color: #ff7895;
   }
 </style>
-
-
-<script>
-  import firebase from 'firebase'
-
-  export default {
-    name: 'signUp',
-    data: function () {
-      return {
-        email: '',
-        password: ''
-      }
-    },
-    methods: {
-      signUp: function () {
-        firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
-          (user) => {
-            this.$emit("loggedIn", true);
-            this.$router.replace('hello');
-          },
-          (err) => {
-            alert('Oops. ' + err.message);
-          }
-        );
-      }
-    }
-  }
-</script>
