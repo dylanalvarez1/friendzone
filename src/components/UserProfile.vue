@@ -29,6 +29,9 @@
             </div>
           </div>
       </div>
+
+      <br>
+
       <div><p id="groupLabel">Groups:</p>
           <div id="groupList" v-for="group in groups" :key="group.name" class="container" @click="goToGroupPage(group.name)">
             <img id="groupIcon" :src="group.url" alt="Avatar" class="image groupPic" style="width:100%">
@@ -39,6 +42,7 @@
             </div>
           </div>
       </div>
+      <br><br>
     </div>
   </div>
 </div>
