@@ -20,15 +20,11 @@
     </div>
     <div class="grid-item item3">
       <div><p id="friendLabel">Friends:</p>
-          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToUserPage(friend.uid)">
+          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToFollowedPage(friend.displayName)">
             <Icon :url="friend.photoURL" :label="friend.displayName"></Icon>
           </div>
       </div>
-      <div><p id="groupLabel">Groups:</p>
-          <div id="groupList" v-for="group in groups" :key="group.name" class="container" @click="goToGroupPage(group.name)">
-           <Icon :url="group.url" :label="group.name"></Icon>
-          </div>
-      </div>
+
     </div>
   </div>
 </div>
@@ -58,7 +54,12 @@ import Icon from '@/components/Icon'
     },
     methods: {
       goToUserPage: function(name) {
-        alert(name);
+      alert("Go to " + name + "'s room?");
+      },
+      goToFollowedPage: function(name) {
+        console.log("name", name);
+      this.$router.go({ name: 'Home', params: { username: name } });
+
       },
       goToGroupPage: function(name) {
         alert(name);
@@ -72,20 +73,8 @@ import Icon from '@/components/Icon'
 
     },
     mounted: function() {
-     /*  let friend1 = {"name": "friend1", "id": 1, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let friend2 = {"name": "friend2", "id": 2, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let friend3 = {"name": "friend3", "id": 3, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let friend4 = {"name": "friend4", "id": 4, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let friend5 = {"name": "friend5", "id": 5, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
 
-      let group1 = {"name": "group1", "id": 1, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let group2 = {"name": "group2", "id": 2, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let group3 = {"name": "group3", "id": 3, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let group4 = {"name": "group4", "id": 4, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let group5 = {"name": "group5", "id": 5, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      */
-
-     console.log("props: " + this.username);
+      console.log("route params:", this.$route.params.username);
 
       const userId = firebase.auth().currentUser.email.replace(".","");
 
@@ -95,11 +84,11 @@ import Icon from '@/components/Icon'
         console.log(this.user.friends);
 
       }).then(() => {
-          let i = 0;
+
           this.user.friends.forEach(friend => {
             let tempId = friend.replace(".","");
             firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
-            this.friends[i++] = snapshot.val();
+            this.friends.push(snapshot.val());
 
             });
 
