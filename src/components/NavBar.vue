@@ -22,7 +22,6 @@ import firebase from 'firebase'
     methods: {
       logout: function() {
         firebase.auth().signOut().then(()=> {
-          this.$emit("loggedIn", false);
           this.$router.replace('login');
         });
       },
