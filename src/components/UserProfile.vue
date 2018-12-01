@@ -77,13 +77,14 @@ import Icon from '@/components/Icon'
         //console.log("route params:", this.$route.params.username);
 
 
-        if(this.params != undefined || this.params == " ") {
+        if(this.params != undefined && this.params != " ") {
           //This is when you visit another profile, there is a path param in the route
           console.log("In getUser call with route params");
           const userId = this.params.replace(".","");
           console.log("userId", userId);
           this.getUserById(userId);
         }
+
         else {
           //default call with no router params
           console.log("In getUser call where there is no route params");
@@ -121,6 +122,9 @@ import Icon from '@/components/Icon'
     watch: {
       '$route.params.username': function (username) {
         console.log("In watched for param: ", username);
+        if(this.params === " ") {
+          //There is no router param so set it equal to who is signed in
+        }
         this.params = username;
         this.getUser();
 
@@ -128,10 +132,20 @@ import Icon from '@/components/Icon'
     },
     beforeRouteUpdate (to, from, next) {
       if(to.params) {
-        const userId = to.params.username.replace(".","");
-        console.log("BeforeRouteUpdate:", to.params.username);
-        this.params = userId;
-        next();
+        if(to.params.username === " ") {
+          //If the route param is empty
+          console.log("Param is a space!")
+          this.params = " ";
+          next();
+        }
+        else {
+          const userId = to.params.username.replace(".","");
+          console.log("BeforeRouteUpdate:", to.params.username);
+          this.params = userId;
+           next();
+        }
+
+
       }
     },
   }
