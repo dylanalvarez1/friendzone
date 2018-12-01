@@ -13,6 +13,9 @@ import firebase from 'firebase'
 Vue.use(Router)
 
 let router = new Router({
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  },
   routes: [
     {
       path: '*',

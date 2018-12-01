@@ -77,7 +77,7 @@ import Icon from '@/components/Icon'
         //console.log("route params:", this.$route.params.username);
 
 
-        if(this.params != undefined) {
+        if(this.params != undefined || this.params == " ") {
           //This is when you visit another profile, there is a path param in the route
           console.log("In getUser call with route params");
           const userId = this.params.replace(".","");
