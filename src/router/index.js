@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Explore from '@/components/Explore'
 import GroupRegistration from '@/components/GroupRegistration'
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/Login'
@@ -46,6 +47,14 @@ let router = new Router({
       path: '/group-registration',
       name: 'Group Registration',
       component: GroupRegistration,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/explore',
+      name: 'Explore',
+      component: Explore,
       meta: {
         requiresAuth: true
       }
