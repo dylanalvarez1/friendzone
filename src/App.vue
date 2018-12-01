@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <NavBar v-if="user" @loggedIn="login"></NavBar>
-    <router-view @loggedIn="login" />
+    <transition name="fade" mode="out-in">
+      <router-view @loggedIn="login" />
+    </transition>
   </div>
 </template>
 
@@ -34,6 +36,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
 
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .4s ease;
+}
+.fade-enter, .fade-leave-active {
+  opacity: 0;
 }
 
 </style>
