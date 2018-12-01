@@ -12,24 +12,6 @@
       <form>
         <div class="form-group">
           <input type="text"
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
-                 class="form-control register-input"
-                 placeholder="Username"
-                 v-model="username">
-        </div>
-        <div class="form-group">
-          <input type="text"
->>>>>>> Stashed changes
-                 class="form-control register-input"
-                 placeholder="Username"
-                 v-model="username">
-        </div>
-        <div class="form-group">
-          <input type="text"
->>>>>>> Stashed changes
                  class="form-control register-input"
                  placeholder="Username"
                  v-model="username">
@@ -51,7 +33,7 @@
         </div>
         <br><br><br>
       </form>
-      <button type="submit" class="btn btn-warning">Sign Up</button>
+      <button @click="signUp" type="submit" class="btn btn-warning">Sign Up</button>
       <br><br><br>
       <span style="color: black">Or go back to <router-link to="/login">login</router-link></span>
       <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -77,17 +59,24 @@
       signUp: function () {
         firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
           (user) => {
-            console.log(user);
-            firebase.database().ref('users/' + user.uid).set({
-              username: this.username,
+            console.log("User id: " + this.email);
+            const uid = this.email.replace(".","");
+            firebase.database().ref('users/' + uid).set({
+              uid: uid,
+              displayName: this.username,
               email: this.email,
-              profile_picture : "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
+              photoURL : "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg",
+              admin: false,
+              followers: [],
+              groups: [],
+              roomId: 12
             });
             // this.$emit("log_in");
             this.$router.replace('home');
+          },
           (err) => {
             alert('Oops. ' + err.message);
-          }}
+          }
         );
       }
     }
