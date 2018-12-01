@@ -5,6 +5,8 @@ import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
 import UserProfile from '@/components/UserProfile'
+import GroupProfile from '@/components/GroupProfile'
+import RoomComponent from '@/components/Room'
 import firebase from 'firebase'
 
 Vue.use(Router)
@@ -49,6 +51,16 @@ let router = new Router({
       meta: {
         requiresAuth: true
       }
+    },
+    {
+      path: '/group',
+      name: 'group',
+      component: GroupProfile
+    },
+    {
+      path: '/room',
+      name: 'room',
+      component: RoomComponent
     }
   ]
 })
@@ -60,7 +72,6 @@ router.beforeEach((to, from, next) => {
   let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
   if(requiresAuth && !currentUser) next('login');
-  //else if (!requiresAuth && currentUser) next('hello');  <- This might cause security issues if gone, not sure, but for now leave commented so we can go to other routes
   else next();
 })
 
