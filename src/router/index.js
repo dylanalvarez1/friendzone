@@ -13,6 +13,9 @@ import firebase from 'firebase'
 Vue.use(Router)
 
 let router = new Router({
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  },
   routes: [
     {
       path: '*',
@@ -23,12 +26,13 @@ let router = new Router({
       redirect: '/login'
     },
     {
-      path: '/home',
+      path: '/home/:username?',
       name: 'Home',
       component: UserProfile,
       meta: {
         requiresAuth: true
       }
+
     },
     {
       path: '/login',
@@ -70,7 +74,10 @@ let router = new Router({
       component: RoomComponent,
       meta: {
         requiresAuth: true
-      }
+      },
+      props: (route) => ({
+        username: route.query.username,
+      })
     }
   ]
 })

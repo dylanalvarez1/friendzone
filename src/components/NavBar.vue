@@ -1,6 +1,6 @@
 <template>
 <div>
-   <ul>
+   <ul id="navbar">
     <li style="float:right" @click="logout"><a>Logout</a></li>
     <li style="float:right" @click="toExplore"><a>Explore</a></li>
     <li style="float:right" @click="toProfile"><a>Profile</a></li>
@@ -22,26 +22,30 @@ import firebase from 'firebase'
     methods: {
       logout: function() {
         firebase.auth().signOut().then(()=> {
-          this.$router.replace('login');
+          this.$router.push({ path: `/login/` });
         });
       },
       toProfile: function() {
         console.log("To home!");
-        this.$router.replace('home');
+        let space = " ";
+        this.$router.push({ path: `/home/${space}` });
       },
       toRoom: function() {
         console.log("To home!");
-        this.$router.replace('room');
+        this.$router.push({ path: `/room/` });
       },
       toExplore: function() {
         console.log("To explore!");
-        this.$router.replace('explore');
+        this.$router.push({ path: `/explore/` });
       },
       toGroup: function() {
-        this.$router.replace('group');
+        this.$router.push({ path: `/group/` });
       }
 
     },
+    mounted: function() {
+
+    }
 
   }
 </script>

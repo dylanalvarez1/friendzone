@@ -23,7 +23,9 @@ export default {
 
     }
   },
+  props: ['username'],
   mounted: function() {
+    console.log("props: ", this.username);
     // Make the DIV element draggable:
 dragElement(document.getElementById("draggable"));
 
