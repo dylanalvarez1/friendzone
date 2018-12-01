@@ -13,14 +13,14 @@
         <p>Go to room</p>
       </div>
     </div>
-    <div class="grid-item item2">
-      <h2>{{this.user.displayName}}</h2>
-      <p>{{this.user.email}}</p>
-      <img :src="user.photoURL" /><br>
+    <div v-if="user" class="grid-item item2">
+      <h2 v-if="user.displayName">{{this.user.displayName}}</h2>
+      <p v-if="user.email">{{this.user.email}}</p>
+      <img v-if="user.photoURL" :src="user.photoURL" /><br>
     </div>
     <div class="grid-item item3">
       <div><p id="friendLabel">Friends:</p>
-          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToFollowedPage(friend.displayName)">
+          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToFollowedPage(friend.email)">
             <Icon :url="friend.photoURL" :label="friend.displayName"></Icon>
           </div>
       </div>
@@ -44,7 +44,8 @@ import Icon from '@/components/Icon'
          "email": "",
          "friends": []
        },
-       friends: []
+       friends: [],
+       params: undefined,
 
       }
     },
@@ -54,12 +55,11 @@ import Icon from '@/components/Icon'
     },
     methods: {
       goToUserPage: function(name) {
-      alert("Go to " + name + "'s room?");
+        alert("Go to " + name + "'s room?");
       },
       goToFollowedPage: function(name) {
         console.log("name", name);
-      this.$router.go({ name: 'Home', params: { username: name } });
-
+        this.$router.push({ path: `/home/${name}` });
       },
       goToGroupPage: function(name) {
         alert(name);
@@ -71,33 +71,83 @@ import Icon from '@/components/Icon'
         alert("Now entering " + name + "'s room");
       },
 
+      getUser: function() {
+        //Gets the correct user by checking if there is a router param and then calls getUserById (firebase call)
+
+        //console.log("route params:", this.$route.params.username);
+
+
+        if(this.params != undefined && this.params != " ") {
+          //This is when you visit another profile, there is a path param in the route
+          console.log("In getUser call with route params");
+          const userId = this.params.replace(".","");
+          console.log("userId", userId);
+          this.getUserById(userId);
+        }
+
+        else {
+          //default call with no router params
+          console.log("In getUser call where there is no route params");
+          const userId = firebase.auth().currentUser.email.replace(".","");
+          console.log("userId", userId);
+          this.getUserById(userId);
+        }
+
+      },
+
+      getUserById: function (userId) {
+        firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
+            this.user = snapshot.val();
+            //console.log(this.user);
+            console.log(this.user.friends);
+
+          }).then(() => {
+              this.friends = []; //empty the array before filling it with user info
+              this.user.friends.forEach(friend => {
+                let tempId = friend.replace(".","");
+                firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
+                this.friends.push(snapshot.val());
+
+                });
+
+              });
+          });
+      }
+
     },
     mounted: function() {
 
-      console.log("route params:", this.$route.params.username);
+      this.getUser();
+    },
+    watch: {
+      '$route.params.username': function (username) {
+        console.log("In watched for param: ", username);
+        if(this.params === " ") {
+          //There is no router param so set it equal to who is signed in
+        }
+        this.params = username;
+        this.getUser();
 
-      const userId = firebase.auth().currentUser.email.replace(".","");
+      }
+    },
+    beforeRouteUpdate (to, from, next) {
+      if(to.params) {
+        if(to.params.username === " ") {
+          //If the route param is empty
+          console.log("Param is a space!")
+          this.params = " ";
+          next();
+        }
+        else {
+          const userId = to.params.username.replace(".","");
+          console.log("BeforeRouteUpdate:", to.params.username);
+          this.params = userId;
+           next();
+        }
 
-      firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
-        this.user = snapshot.val();
-        //console.log(this.user);
-        console.log(this.user.friends);
 
-      }).then(() => {
-
-          this.user.friends.forEach(friend => {
-            let tempId = friend.replace(".","");
-            firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
-            this.friends.push(snapshot.val());
-
-            });
-
-          });
-      });
-
-    console.log("my full friends profile array:", this.friends);
-
-    }
+      }
+    },
   }
 </script>
 
