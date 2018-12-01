@@ -20,7 +20,7 @@
     </div>
     <div class="grid-item item3">
       <div><p id="friendLabel">Friends:</p>
-          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToFollowedPage(friend.displayName)">
+          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToFollowedPage(friend.email)">
             <Icon :url="friend.photoURL" :label="friend.displayName"></Icon>
           </div>
       </div>
