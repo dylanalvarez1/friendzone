@@ -21,14 +21,17 @@ var config = {
 firebase.initializeApp(config);
 firebase.auth().onAuthStateChanged(function(user) {
   console.log("on auth state change")
+  // this.$emit("user_change",firebase.auth().currentUser);
+
   if(!app) {
     /* eslint-disable no-new */
     app = new Vue({
       el: '#app',
       router,
+      // render:h=>h(app),
       components: { App },
       template: '<App/>'
-    })
+    })//.$mount('#app');
   }
 });
 
