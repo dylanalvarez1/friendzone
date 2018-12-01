@@ -12,7 +12,30 @@
       <form>
         <div class="form-group">
           <input type="text"
-                 id="addListingUsername"
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+=======
+                 class="form-control register-input"
+                 placeholder="Username"
+                 v-model="username">
+        </div>
+        <div class="form-group">
+          <input type="text"
+>>>>>>> Stashed changes
+                 class="form-control register-input"
+                 placeholder="Username"
+                 v-model="username">
+        </div>
+        <div class="form-group">
+          <input type="text"
+>>>>>>> Stashed changes
+                 class="form-control register-input"
+                 placeholder="Username"
+                 v-model="username">
+        </div>
+        <div class="form-group">
+          <input type="text"
                  class="form-control register-input"
                  placeholder="Email"
                  v-model="email">
@@ -22,7 +45,6 @@
       <form>
         <div class="form-group">
           <input type="password"
-                 id="addListingCode"
                  class="form-control register-input"
                  placeholder="Password"
                  v-model="password">
@@ -47,19 +69,25 @@
     data: function () {
       return {
         email: '',
-        password: ''
+        password: '',
+        username: ''
       }
     },
     methods: {
       signUp: function () {
         firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
           (user) => {
+            console.log(user);
+            firebase.database().ref('users/' + user.uid).set({
+              username: this.username,
+              email: this.email,
+              profile_picture : "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
+            });
             // this.$emit("log_in");
             this.$router.replace('home');
-          },
           (err) => {
             alert('Oops. ' + err.message);
-          }
+          }}
         );
       }
     }
