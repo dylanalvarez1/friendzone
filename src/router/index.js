@@ -59,12 +59,18 @@ let router = new Router({
     {
       path: '/group',
       name: 'group',
-      component: GroupProfile
+      component: GroupProfile,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/room',
       name: 'room',
-      component: RoomComponent
+      component: RoomComponent,
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
 })

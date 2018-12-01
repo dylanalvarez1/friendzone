@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <NavBar v-if="current_user" @user_change="user_change"></NavBar>
+    <NavBar v-if="current_user" ></NavBar>
     <!--@log_in="log_in" @log_out="log_out"></NavBar>-->
     <transition name="fade" mode="out-in">
-      <router-view @loggedIn="login" />
+      <router-view />
     </transition>
   </div>
 </template>
@@ -25,6 +25,7 @@ export default {
     // user_change: function(user) {
     //   current_user=user;
     // },
+
 
   },
   created:function(){
