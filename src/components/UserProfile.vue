@@ -50,7 +50,7 @@ import Icon from '@/components/Icon'
       }
     },
     components: {
-    Icon,
+      Icon,
     },
     methods: {
       goToUserPage: function(name) {
