@@ -29,7 +29,8 @@
           <input type="password"
                  class="form-control register-input"
                  placeholder="Password"
-                 v-model="password">
+                 v-model="password"
+                 @keyup.enter="signUp">
         </div>
         <br><br><br>
       </form>
@@ -72,7 +73,7 @@
               roomId: 12
             });
             // this.$emit("log_in");
-            this.$router.replace('home');
+            this.$router.push({ path: `/home/` });
           },
           (err) => {
             alert('Oops. ' + err.message);
