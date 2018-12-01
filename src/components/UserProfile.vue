@@ -2,33 +2,29 @@
 <div>
   <div class="grid-container">
     <div class="grid-item item1">
-      <div @click="followUser(username)">
+      <div @click="followUser(user.displayName)">
         <img src="../assets/logo.png" style="width: 50px; height: 50px"/>
         <p>Follow</p>
       </div>
     </div>
     <div class="grid-item item4">
-      <div @click="goToRoom(username)">
+      <div @click="goToRoom(user.displayName)">
         <img src="../assets/logo.png" style="width: 50px; height: 50px;"/>
         <p>Go to room</p>
       </div>
     </div>
-    <div class="grid-item item2">
-      <h2>{{this.username}}</h2>
-      <p>{{this.uid}}</p>
-      <img src="../assets/logo.png"/><br>
+    <div v-if="user" class="grid-item item2">
+      <h2 v-if="user.displayName">{{this.user.displayName}}</h2>
+      <p v-if="user.email">{{this.user.email}}</p>
+      <img v-if="user.photoURL" :src="user.photoURL" /><br>
     </div>
     <div class="grid-item item3">
       <div><p id="friendLabel">Friends:</p>
-          <div id="friendList" v-for="friend in friends" :key="friend.name" class="container" @click="goToUserPage(friend.name)">
-            <Icon :url="friend.url" :label="friend.name"></Icon>
+          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToFollowedPage(friend.email)">
+            <Icon :url="friend.photoURL" :label="friend.displayName"></Icon>
           </div>
       </div>
-      <div><p id="groupLabel">Groups:</p>
-          <div id="groupList" v-for="group in groups" :key="group.name" class="container" @click="goToGroupPage(group.name)">
-           <Icon :url="group.url" :label="group.name"></Icon>
-          </div>
-      </div>
+
     </div>
   </div>
 </div>
@@ -42,19 +38,28 @@ import Icon from '@/components/Icon'
     name: 'login',
     data: function() {
       return {
-        username: "",
-        uid: "",
-        friends: undefined,
-        groups: undefined
+       user : {
+         "photoURL": "",
+         "displayName": "",
+         "email": "",
+         "friends": []
+       },
+       friends: [],
+       params: undefined,
 
       }
     },
+    props: ['username'],
     components: {
       Icon,
     },
     methods: {
       goToUserPage: function(name) {
-        alert(name);
+        alert("Go to " + name + "'s room?");
+      },
+      goToFollowedPage: function(name) {
+        console.log("name", name);
+        this.$router.push({ path: `/home/${name}` });
       },
       goToGroupPage: function(name) {
         alert(name);
@@ -66,29 +71,83 @@ import Icon from '@/components/Icon'
         alert("Now entering " + name + "'s room");
       },
 
+      getUser: function() {
+        //Gets the correct user by checking if there is a router param and then calls getUserById (firebase call)
+
+        //console.log("route params:", this.$route.params.username);
+
+
+        if(this.params != undefined && this.params != " ") {
+          //This is when you visit another profile, there is a path param in the route
+          console.log("In getUser call with route params");
+          const userId = this.params.replace(".","");
+          console.log("userId", userId);
+          this.getUserById(userId);
+        }
+
+        else {
+          //default call with no router params
+          console.log("In getUser call where there is no route params");
+          const userId = firebase.auth().currentUser.email.replace(".","");
+          console.log("userId", userId);
+          this.getUserById(userId);
+        }
+
+      },
+
+      getUserById: function (userId) {
+        firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
+            this.user = snapshot.val();
+            //console.log(this.user);
+            console.log(this.user.friends);
+
+          }).then(() => {
+              this.friends = []; //empty the array before filling it with user info
+              this.user.friends.forEach(friend => {
+                let tempId = friend.replace(".","");
+                firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
+                this.friends.push(snapshot.val());
+
+                });
+
+              });
+          });
+      }
+
     },
     mounted: function() {
-      let friend1 = {"name": "friend1", "id": 1, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let friend2 = {"name": "friend2", "id": 2, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let friend3 = {"name": "friend3", "id": 3, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let friend4 = {"name": "friend4", "id": 4, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let friend5 = {"name": "friend5", "id": 5, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
 
-      let group1 = {"name": "group1", "id": 1, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let group2 = {"name": "group2", "id": 2, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let group3 = {"name": "group3", "id": 3, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let group4 = {"name": "group4", "id": 4, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
-      let group5 = {"name": "group5", "id": 5, "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"};
+      this.getUser();
+    },
+    watch: {
+      '$route.params.username': function (username) {
+        console.log("In watched for param: ", username);
+        if(this.params === " ") {
+          //There is no router param so set it equal to who is signed in
+        }
+        this.params = username;
+        this.getUser();
 
-      let currentUser = firebase.auth().currentUser;
-      //console.log(currentUser);
-      this.username = currentUser.email;
-      this.uid = currentUser.uid;
-      this.friends = new Array(friend1, friend2, friend3, friend4, friend5);
-      //this.friends.forEach(friend => console.log(friend.name));
-      this.groups = new Array(group1, group2, group3, group4, group5);
-      //this.groups.forEach(group => console.log(group.name));
-    }
+      }
+    },
+    beforeRouteUpdate (to, from, next) {
+      if(to.params) {
+        if(to.params.username === " ") {
+          //If the route param is empty
+          console.log("Param is a space!")
+          this.params = " ";
+          next();
+        }
+        else {
+          const userId = to.params.username.replace(".","");
+          console.log("BeforeRouteUpdate:", to.params.username);
+          this.params = userId;
+           next();
+        }
+
+
+      }
+    },
   }
 </script>
 

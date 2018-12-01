@@ -12,7 +12,12 @@
       <form>
         <div class="form-group">
           <input type="text"
-                 id="addListingUsername"
+                 class="form-control register-input"
+                 placeholder="Username"
+                 v-model="username">
+        </div>
+        <div class="form-group">
+          <input type="text"
                  class="form-control register-input"
                  placeholder="Email"
                  v-model="email">
@@ -22,14 +27,14 @@
       <form>
         <div class="form-group">
           <input type="password"
-                 id="addListingCode"
                  class="form-control register-input"
                  placeholder="Password"
-                 v-model="password">
+                 v-model="password"
+                 @keyup.enter="signUp">
         </div>
         <br><br><br>
       </form>
-      <button type="submit" class="btn btn-primary">Sign Up</button>
+      <button @click="signUp" type="submit" class="btn btn-warning">Sign Up</button>
       <br><br><br>
       <span style="color: black">Or go back to <router-link to="/login">login</router-link></span>
       <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -47,15 +52,28 @@
     data: function () {
       return {
         email: '',
-        password: ''
+        password: '',
+        username: ''
       }
     },
     methods: {
       signUp: function () {
         firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
           (user) => {
+            console.log("User id: " + this.email);
+            const uid = this.email.replace(".","");
+            firebase.database().ref('users/' + uid).set({
+              uid: uid,
+              displayName: this.username,
+              email: this.email,
+              photoURL : "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg",
+              admin: false,
+              followers: [],
+              groups: [],
+              roomId: 12
+            });
             // this.$emit("log_in");
-            this.$router.replace('home');
+            this.$router.push({ path: `/home/` });
           },
           (err) => {
             alert('Oops. ' + err.message);
@@ -73,7 +91,7 @@
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
   }
 
-  .btn-primary {
+  .btn-warning {
     background-color: black;
   }
 
@@ -108,6 +126,6 @@
   }
 
   .register-input {
-    color: black;
+    color: #ff7895;
   }
 </style>

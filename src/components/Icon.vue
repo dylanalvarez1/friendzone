@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="wrapper">
     <img id="friendIcon" :src="url" alt="Avatar" class="image friendPic" style="width:100%">
     <div class="middle iconLabel">
       <div id="iconLabel" class="text">
@@ -28,6 +28,10 @@ import firebase from 'firebase'
 </script>
 
 <style scoped>
+
+  #wrapper {
+    cursor: pointer;
+  }
 
   .image {
     opacity: 1;
