@@ -3,7 +3,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/paper/bootstrap.min.css">
   <div class="container">
     <div class="row">
-      <br>
+      <br><br>
       <h2>Log In</h2>
     </div>
     <br><br><br>
@@ -14,28 +14,30 @@
           <input type="text"
                  id="addListingUsername"
                  class="form-control register-input"
-                 placeholder="Username"
+                 placeholder="Email"
                  v-model="email">
         </div>
         <br><br><br>
       </form>
       <form>
         <div class="form-group">
-          <input type="text"
+          <input type="password"
                  id="addListingCode"
                  class="form-control register-input"
-                 placeholder="Full Name"
+                 placeholder="Password"
                  v-model="password">
         </div>
         <br><br><br>
       </form>
-      <br><br><br><br><br><br>
-      <button type="submit" class="btn btn-warning" v-on:click="signIn">Log In</button>
-      <br><br><br><br><br>
-      <p>You don't have an account?
+      <button
+        type="submit"
+        class="btn btn-default"
+        v-on:click="signIn" style="color: black">Log In</button>
+      <br><br><br>
+      <p style="color: white">You don't have an account?
         <router-link to="/sign-up">You can create one</router-link>
       </p>
-      <br><br><br><br><br><br>
+      <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
     </div>
     <div class="col-md-4"></div>
   </div>
@@ -72,12 +74,12 @@
 <style scoped>
   h2 {
     text-align: center;
-    color: #ff7895;
+    color: white;
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
   }
 
-  .btn-warning {
-    background-color: #ff95bb;
+  .btn-primary {
+    background-color: white;
   }
 
   label {
@@ -85,7 +87,7 @@
   }
 
   body {
-    background-image: url("../assets/123.jpg");
+    background-image: url("../assets/454.jpg");
     background-repeat: no-repeat;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -95,18 +97,18 @@
   }
 
   input[type="text"]::-webkit-input-placeholder {
+    color: white !important;
+  }
+
+  input[type="password"]::-webkit-input-placeholder {
+    color: white !important;
+  }
+
+  input[type="password"]::-moz-placeholder {
     color: #ff7895 !important;
   }
 
-  input[type="text"]:-moz-placeholder {
-    color: #ff7895 !important;
-  }
-
-  input[type="text"]::-moz-placeholder {
-    color: #ff7895 !important;
-  }
-
-  input[type="text"]:-ms-input-placeholder {
+  input[type="password"]:-ms-input-placeholder {
     color: #ff7895 !important;
   }
 
