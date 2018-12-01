@@ -21,22 +21,12 @@
     <div class="grid-item item3">
       <div><p id="friendLabel">Friends:</p>
           <div id="friendList" v-for="friend in friends" :key="friend.name" class="container" @click="goToUserPage(friend.name)">
-            <img id="friendIcon" :src="friend.url" alt="Avatar" class="image friendPic" style="width:100%">
-            <div class="middle iconLabel">
-              <div id="iconLabel" class="text">
-                {{friend.name}}
-              </div>
-            </div>
+            <Icon :url="friend.url" :label="friend.name"></Icon>
           </div>
       </div>
       <div><p id="groupLabel">Groups:</p>
           <div id="groupList" v-for="group in groups" :key="group.name" class="container" @click="goToGroupPage(group.name)">
-            <img id="groupIcon" :src="group.url" alt="Avatar" class="image groupPic" style="width:100%">
-            <div class="middle iconLabel">
-              <div id="iconLabel" class="text">
-                {{group.name}}
-              </div>
-            </div>
+           <Icon :url="group.url" :label="group.name"></Icon>
           </div>
       </div>
     </div>
@@ -47,7 +37,7 @@
 
 <script>
 import firebase from 'firebase'
-
+import Icon from '@/components/Icon'
   export default {
     name: 'login',
     data: function() {
@@ -58,6 +48,9 @@ import firebase from 'firebase'
         groups: undefined
 
       }
+    },
+    components: {
+    Icon,
     },
     methods: {
       goToUserPage: function(name) {
