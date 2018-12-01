@@ -63,6 +63,7 @@ export default {
   name: 'groupRegistration',
   data: function() {
     return {
+      uid: firebase.auth().currentUser.email.replace(".",""),
       groupName: "",
       groupDescription: "",
       groupPicture: new File(),
@@ -71,7 +72,10 @@ export default {
   },
   methods: {
     onFileChanged: function(input) {
+      //name
+      //Konachan_com___238107_2girls_blue_eyes_braids_cevio_ia_kneehighs_long_hair_one__cevio__pink_hair_short_hair_skirt_sotsunaku_thighhighs_vocal
       this.groupPicture = input.target.files[0];
+      //this.groupPicture.name = "profilePicture" + this.groupPicture.name.substr(this.groupPicture.name.indexOf("."));
       this.isValid();
       console.log(this.groupPicture);
       const reader = new FileReader();
@@ -100,14 +104,9 @@ export default {
 
       //TODO remove
       alert("form \"submitted\"");
-
-
-      //TODO store picture into Firebase Storage
-
-      //TODO retrieve proper values for these fields.
-      const iconUrl = "someiconurl";
-      const groupID = "somegroupid";
-      const roomID = "someroomid";
+      const iconUrl = this.uploadPicture();
+      const groupID = this.createGid();
+      const roomID = groupID;
 
       //intialize the group
       const newGroup = {
@@ -116,16 +115,16 @@ export default {
         iconURL: iconUrl,
         members: [],
         moderators: [],
-        ownerID: firebase.auth().currentUser.uid,
+        ownerID: firebase.auth().currentUser.email.replace(".",""),
         roomID: roomID
-      }
+      };
 
 
       //initialize the room
       const newRoom = {
         furnitures: {},
         isGroupRoom: true,
-        ownerID: newGroup.groupID,
+        ownerID: groupID,
         roomID: roomID,
         title: `${this.groupName}'s Room`
       };
@@ -135,8 +134,37 @@ export default {
       console.log(newGroup);
       console.log(newRoom);
 
+      firebase.database().ref('Groups/' + groupID).set({
+        description: this.groupDescription,
+        groupID: groupID,
+        iconURL: iconUrl,
+        members: [],
+        moderators: [],
+        ownerID: firebase.auth().currentUser.email.replace(".",""),
+        roomID: roomID
+      });
+      firebase.database().ref('Rooms/' + roomID).set({
+        furnitures: {},
+        isGroupRoom: true,
+        ownerID: firebase.auth().currentUser.email.replace(".",""),
+        roomID: roomID,
+        title: `${this.groupName}'s Room`
+      });
       //TODO redirect to group profile page OR edit page OR room. up to you guys.
+      alert("send to group profile page or room");
 
+    },
+//https://firebasestorage.googleapis.com/v0/b/friendzone-4930.appspot.com/o/images%2FKonachan_com___238107_2girls_blue_eyes_braids_cevio_ia_kneehighs_long_hair_one__cevio__pink_hair_short_hair_skirt_sotsunaku_thighhighs_vocaloid_1818x1358.jpg?alt=media&token=d4411814-ae75-4612-a591-50b7b309fae9
+    uploadPicture: function() {
+      const storageRef = firebase.storage().ref();
+      const fullpath = `images/groups/${this.gid}/profilePicture${this.groupPicture.name.substr(this.groupPicture.name.indexOf("."))}`
+      const uploadTask = storageRef.child(fullpath).put(this.groupPicture);
+      uploadTask.on('state_changed', snapshot => {}, err => console.log(err), () => console.log('successfully uploaded'));
+      return fullpath;
+    },
+
+    createGid: function(){
+      return this.groupName + Date.now();
     },
 
     //This function checks to see if name, desc, and file exists, and that the file is an image file.
