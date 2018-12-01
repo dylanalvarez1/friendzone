@@ -29,6 +29,7 @@ let router = new Router({
       meta: {
         requiresAuth: true
       }
+
     },
     {
       path: '/login',
@@ -70,7 +71,10 @@ let router = new Router({
       component: RoomComponent,
       meta: {
         requiresAuth: true
-      }
+      },
+      props: (route) => ({
+        username: route.query.username,
+      })
     }
   ]
 })
