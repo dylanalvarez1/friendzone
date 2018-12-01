@@ -1,12 +1,16 @@
 <template>
   <div id="app">
-    <NavBar v-if="user" @loggedIn="login"></NavBar>
-    <router-view @loggedIn="login" />
+    <NavBar v-if="current_user" @user_change="user_change"></NavBar>
+    <!--@log_in="log_in" @log_out="log_out"></NavBar>-->
+    <transition name="fade" mode="out-in">
+      <router-view @loggedIn="login" />
+    </transition>
   </div>
 </template>
 
 <script>
 import NavBar from './components/NavBar.vue'
+import firebase from 'firebase'
 export default {
   name: 'App',
   components: {
@@ -14,15 +18,26 @@ export default {
   },
   data: function() {
       return {
-       user : false,
-      }
+       current_user : null,
+      };
     },
   methods: {
-    login: function(bool) {
-      console.log("In logged in");
-      this.user = bool;
-    }
+    // user_change: function(user) {
+    //   current_user=user;
+    // },
+
   },
+  created:function(){
+    var vm=this;
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        vm.current_user = user;
+      } else {
+        vm.current_user = null;
+      }
+    });
+  }
+
 
 }
 </script>
@@ -34,6 +49,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
 
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .4s ease;
+}
+.fade-enter, .fade-leave-active {
+  opacity: 0;
 }
 
 </style>

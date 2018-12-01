@@ -55,8 +55,8 @@
       signUp: function () {
         firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
           (user) => {
-            this.$emit("loggedIn", true);
-            this.$router.replace('hello');
+            // this.$emit("log_in");
+            this.$router.replace('home');
           },
           (err) => {
             alert('Oops. ' + err.message);

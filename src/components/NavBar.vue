@@ -28,15 +28,18 @@ import firebase from 'firebase'
       },
       toProfile: function() {
         console.log("To home!");
-        this.$router.replace('hello');
+        this.$router.replace('home');
       },
       toRoom: function() {
         console.log("To home!");
-        this.$router.replace('home');
+        this.$router.replace('room');
       },
       toExplore: function() {
         console.log("To explore!");
         this.$router.replace('explore');
+      },
+      toGroup: function() {
+        this.$router.replace('group');
       }
 
     },
