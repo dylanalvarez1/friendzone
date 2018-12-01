@@ -220,7 +220,7 @@ li a:hover:not(.active) {
 .grid-container {
   display: grid;
   grid-gap: 10px;
-  background-color: #2196F3;
+  background-color: #3686c4;
   padding: 10px;
   align-content: center;
 
