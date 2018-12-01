@@ -2,8 +2,8 @@
 <div>
    <ul>
     <li style="float:right" @click="logout"><a>Logout</a></li>
-    <li style="float:right" @click="toGroup"><a>Search</a></li>
-    <li style="float:right" @click="toProfile"><a href="#home">Profile</a></li>
+    <li style="float:right" @click="toExplore"><a>Explore</a></li>
+    <li style="float:right" @click="toProfile"><a>Profile</a></li>
     <li style="float:right" @click="toRoom"><a>My Room</a></li>
   </ul>
 </div>
@@ -33,6 +33,10 @@ import firebase from 'firebase'
       toRoom: function() {
         console.log("To home!");
         this.$router.replace('room');
+      },
+      toExplore: function() {
+        console.log("To explore!");
+        this.$router.replace('explore');
       },
       toGroup: function() {
         this.$router.replace('group');
@@ -80,4 +84,3 @@ li a:hover:not(.active) {
 
 
 </style>
-
