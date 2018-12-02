@@ -19,9 +19,14 @@
       <img v-if="user.photoURL" :src="user.photoURL" /><br>
     </div>
     <div class="grid-item item3">
-      <div><p id="friendLabel">Friends:</p>
-          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToFollowedPage(friend.email)">
+      <div><p id="friendLabel">Following:</p>
+          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToFollowedPage(friend.uid)">
             <Icon :url="friend.photoURL" :label="friend.displayName"></Icon>
+          </div>
+      </div>
+      <div><p id="groupLabel">Groups:</p>
+          <div id="groupList" v-for="group in groups" :key="group.groupId" class="container" @click="goToGroupPage(group.groupId)">
+            <Icon :url="group.iconURL" :label="group.groupId"></Icon>
           </div>
       </div>
 
@@ -42,9 +47,11 @@ import Icon from '@/components/Icon'
          "photoURL": "",
          "displayName": "",
          "email": "",
-         "friends": []
+         "friends": [],
+         "groups": [],
        },
        friends: [],
+       groups: [],
        params: undefined,
 
       }
@@ -88,7 +95,7 @@ import Icon from '@/components/Icon'
         else {
           //default call with no router params
           console.log("In getUser call where there is no route params");
-          const userId = firebase.auth().currentUser.email.replace(".","");
+          const userId = firebase.auth().currentUser.uid;
           console.log("userId", userId);
           this.getUserById(userId);
         }
@@ -98,12 +105,12 @@ import Icon from '@/components/Icon'
       getUserById: function (userId) {
         firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
             this.user = snapshot.val();
-            //console.log(this.user);
-            console.log(this.user.friends);
+            console.log(this.user);
+            console.log(this.user.following);
 
           }).then(() => {
               this.friends = []; //empty the array before filling it with user info
-              this.user.friends.forEach(friend => {
+              this.user.following.forEach(friend => {
                 let tempId = friend.replace(".","");
                 firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
                 this.friends.push(snapshot.val());
