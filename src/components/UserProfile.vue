@@ -25,8 +25,8 @@
           </div>
       </div>
       <div><p id="groupLabel">Groups:</p>
-          <div id="groupList" v-for="group in groups" :key="group.groupId" class="container" @click="goToGroupPage(group.groupId)">
-            <Icon :url="group.iconURL" :label="group.groupId"></Icon>
+          <div id="groupList" v-for="group in groups" :key="group.groupID" class="container" @click="goToGroupPage(group.groupID)">
+            <Icon :url="group.iconURL" :label="group.groupID"></Icon>
           </div>
       </div>
 
@@ -105,15 +105,55 @@ import Icon from '@/components/Icon'
       getUserById: function (userId) {
         firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
             this.user = snapshot.val();
-            console.log(this.user);
-            console.log(this.user.following);
+            //console.log(this.user);
+            //console.log(this.user.following);
 
           }).then(() => {
               this.friends = []; //empty the array before filling it with user info
+              this.groups = [];
               this.user.following.forEach(friend => {
                 let tempId = friend.replace(".","");
                 firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
                 this.friends.push(snapshot.val());
+
+                });
+
+              });
+
+              this.user.groups.forEach(group => {
+                console.log("for each group:")
+                let tempId = group.replace(".","");
+                firebase.database().ref('/groups/' + tempId).once('value').then((snapshot) => {
+                  let temp = snapshot.val();
+                  console.log("Group: ", temp);
+                  // Get a reference to the storage service, which is used to create references in your storage bucket
+                  let storage = firebase.storage();
+
+                  // Create a storage reference from our storage service
+                  let storageRef = storage.ref();
+
+                  // Create a child reference
+                  var imagesRef = storageRef.child('images');
+                  // imagesRef now points to 'images'
+
+                  // Child references can also take paths delimited by '/'
+                  var spaceRef = storageRef.child(temp.iconURL);
+                  // spaceRef now points to "images/space.jpg"
+                  // imagesRef still points to "images"
+
+                  spaceRef.getDownloadURL().then((url) => {
+                      let test = url;
+                      console.log("url", url);
+                      temp.iconURL = url;
+                      console.log("temp", temp);
+                      this.groups.push(temp);
+
+                  }).catch(function(error) {
+
+                  });
+
+
+
 
                 });
 

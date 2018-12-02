@@ -63,11 +63,11 @@ export default {
       firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
           this.user = snapshot.val();
           //console.log(this.user);
-          console.log(this.user.friends);
+          console.log(this.user.following);
 
         }).then(() => {
             this.friends = []; //empty the array before filling it with user info
-            this.user.friends.forEach(friend => {
+            this.user.following.forEach(friend => {
               let tempId = friend.replace(".","");
               firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
               this.friends.push(snapshot.val());
