@@ -16,7 +16,7 @@
     <div v-if="user" class="grid-item item2">
       <h2 v-if="user.displayName">{{this.user.displayName}}</h2>
       <p v-if="user.email">{{this.user.email}}</p>
-      <img v-if="user.photoURL" :src="user.photoURL" /><br>
+      <img v-if="user.photoURL" :src="user.photoURL" alt="no profile image" style="max-height:300px; max-width:300px;" /><br>
     </div>
     <div class="grid-item item3">
       <div><p id="friendLabel">Following:</p>

@@ -21,7 +21,7 @@
       </div>
       <div class="grid-item item2">
         <h2>{{this.group.groupID}}</h2>
-        <img :src="group.iconURL" alt="No group icon"/><br>
+        <img :src="group.iconURL" alt="No group icon" style="max-height:300px; max-width:300px;"/><br>
         <p>{{this.group.description}}</p>
       </div>
       <div class="grid-item item3">
@@ -71,6 +71,9 @@ export default {
     },
     goToRoom: function(name) {
       alert("Now entering " + name + "'s room");
+    },
+    goToFollowedPage: function(name) {
+      this.$router.push({ path: `/home/${name}` });
     },
     customizeGroupProfile: function(groupName) {
       let authorization = "member";
