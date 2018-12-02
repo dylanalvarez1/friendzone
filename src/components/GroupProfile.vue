@@ -20,9 +20,11 @@
         </div>
       </div>
       <div class="grid-item item2">
-        <h2>{{this.group.groupID}}</h2>
-        <img :src="group.iconURL" alt="No group icon" style="max-height:300px; max-width:300px;"/><br>
-        <p>{{this.group.description}}</p>
+        <div v-if="group">
+          <h2>{{this.group.groupID}}</h2>
+          <img :src="group.iconURL" alt="No group icon" style="max-height:300px; max-width:300px;"/><br>
+          <p>{{this.group.description}}</p>
+        </div>
       </div>
       <div class="grid-item item3">
         <div><p id="memberLabel">Members:</p>
@@ -87,16 +89,16 @@ export default {
     getGroup: function() {
       //Gets the correct user by checking if there is a router param and then calls getUserById (firebase call)
 
-      console.log("route params:", this.$route.params.id);
+      //console.log("route params:", this.$route.params.id);
 
       this.params = this.$route.params.id;
 
 
       //This is when you visit another profile, there is a path param in the route
-      console.log("In getGroup call with route params");
-      console.log("params to be passed: ", this.params);
+      //console.log("In getGroup call with route params");
+      //console.log("params to be passed: ", this.params);
       const groupId = this.params;
-      console.log("groupId", groupId);
+      //console.log("groupId", groupId);
       this.getGroupById(groupId);
 
 
@@ -105,10 +107,10 @@ export default {
     },
 
     getGroupById: function (groupId) {
-      console.log("groupId", groupId);
+      ///console.log("groupId", groupId);
       firebase.database().ref('/groups/' + groupId).once('value').then((snapshot) => {
-        console.log("Inside getgroupbyid firebase call");
-        console.log(snapshot.val());
+       // console.log("Inside getgroupbyid firebase call");
+        //console.log(snapshot.val());
         let temp= snapshot.val();
         //console.log("temp", temp);
         let storage = firebase.storage();
@@ -119,8 +121,8 @@ export default {
         // Create a child reference
         var imagesRef = storageRef.child('images');
         // imagesRef now points to 'images'
-        console.log("part 2");
-        console.log(temp.iconURL);
+        //console.log("part 2");
+        //console.log(temp.iconURL);
         // Child references can also take paths delimited by '/'
         var spaceRef = storageRef.child(temp.iconURL);
         // spaceRef now points to "images/space.jpg"
@@ -128,9 +130,9 @@ export default {
 
         spaceRef.getDownloadURL().then((url) => {
             let test = url;
-            console.log("url", url);
+            //console.log("url", url);
             temp.iconURL = url;
-            console.log("temp", temp);
+            //console.log("temp", temp);
             this.group = temp;
 
         }).catch(function(error) {
@@ -152,10 +154,8 @@ export default {
               this.admins.push(snapshot.val());
               });
             });
-            console.log("end of big statement");
-            console.log(this.members);
-            console.log(this.admins);
-            console.log(this.group);
+            //console.log("end of big statement");
+
         });
       });
 
@@ -173,7 +173,7 @@ export default {
 
   watch: {
     '$route.params.id': function (id) {
-      console.log("In watched for param: ", id);
+      //console.log("In watched for param: ", id);
       this.params = id;
       this.getGroup();
 
@@ -182,7 +182,7 @@ export default {
 
   beforeRouteUpdate (to, from, next) {
     const groupId = to.params.id;
-    console.log("BeforeRouteUpdate:", to.params.id);
+    //console.log("BeforeRouteUpdate:", to.params.id);
     this.params = groupId;
     next();
   },
