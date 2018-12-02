@@ -61,7 +61,7 @@ let router = new Router({
       }
     },
     {
-      path: '/group',
+      path: '/group/:id',
       name: 'group',
       component: GroupProfile,
       meta: {

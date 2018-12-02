@@ -69,7 +69,7 @@ import Icon from '@/components/Icon'
         this.$router.push({ path: `/home/${name}` });
       },
       goToGroupPage: function(name) {
-        alert(name);
+        this.$router.push({ path: `/group/${name}` });
       },
       followUser: function(name) {
         alert("Follow " + name + "?");
