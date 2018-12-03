@@ -19,11 +19,11 @@ let router = new Router({
   routes: [
     {
       path: '*',
-      redirect: '/login'
+      redirect: '/home/:userID?'
     },
     {
       path: '/',
-      redirect: '/login'
+      redirect: '/home/:userID?'
     },
     {
       path: '/home/:userID?',
@@ -90,6 +90,8 @@ router.beforeEach((to, from, next) => {
     next();
   }else if(!currentUser && requiresAuth){
     next(`/login`);
+  }else if(currentUser && to.path==='/home'){
+    next(`/home/${currentUser.uid}`);
   }
   //  else if(requiresAuth&&currentUser) {
   //   // next(`/home/${currentUser.uid}`);

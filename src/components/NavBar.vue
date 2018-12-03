@@ -22,7 +22,7 @@ import firebase from 'firebase'
     methods: {
       logout: function() {
         firebase.auth().signOut().then(()=> {
-          this.$router.push({ path: `/login/` });
+          this.$router.push({ path: `/login` });
         });
       },
       toProfile: function() {
@@ -36,10 +36,10 @@ import firebase from 'firebase'
       },
       toExplore: function() {
         console.log("To explore!");
-        this.$router.push({ path: `/explore/` });
+        this.$router.push({ path: `/explore` });
       },
       toGroup: function() {
-        this.$router.push({ path: `/group/` });
+        this.$router.push({ path: `/group` });
       }
 
     },

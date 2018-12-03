@@ -1,10 +1,12 @@
 <template>
 <div>
   <div class="grid-container">
-    <div v-if="current_user.uid!==params" class="grid-item item1">
-      <div @click="followUser(user.displayName)">
+    <div @click="followUser(user.displayName)" v-if="!(current_user.uid===null||current_user.uid===params)" class="grid-item item1">
+      <div >
         <img src="../assets/logo.png" style="width: 50px; height: 50px"/>
-        <p>Follow</p>
+        <!--<p >follow</p>-->
+
+        <p>{{follow_status}}</p>
       </div>
     </div>
     <div class="grid-item item4">
@@ -45,19 +47,23 @@
     name: 'login',
     data: function() {
       return {
+
        user : {
          "photoURL": "",
          "displayName": "",
          "email": "",
          "friends": [],
          "groups": [],
+         "uid" : ""
        },
        friends: [],
        groups: [],
        params: undefined,
-       current_user: null
-
+       current_user: "",
+        follow_status: "follow",
+        // following_status:"follow"
       }
+
     },
     props: ['username'],
     components: {
@@ -80,12 +86,22 @@
         let current_user_following_data=[];
         let new_follow_data=this.params;
         following_ref.once('value').then(function(snapshot) {
+
           snapshot.forEach(function (child) {
             current_user_following_data.push(child.val());
           });
-          current_user_following_data.push(new_follow_data);
+          if(current_user_following_data.includes(new_follow_data)){
+            current_user_following_data.splice(current_user_following_data.indexOf(new_follow_data),1);
+          }else {
+            current_user_following_data.push(new_follow_data);
+          }
           following_ref.set(current_user_following_data);
         });
+        if(this.follow_status==="follow"){
+          this.follow_status="unfollow";
+        }else if(this.follow_status==="unfollow"){
+          this.follow_status="follow";
+        }
 
       },
       goToRoom: function(name) {
@@ -93,18 +109,28 @@
         this.$router.push({ path: `/room/${firebase.auth().currentUser.uid}` });
 
       },
+      updateCurrentUser: function(snapshot){
+        this.current_user=snapshot.val();
 
+      },
       getUser: function() {
         //Gets the correct user by checking if there is a router param and then calls getUserById (firebase call)
 
-        //console.log("route params:", this.$route.params.username);
-        this.params = this.$route.params.userID;
-        this.current_user=firebase.auth().currentUser;
 
-        if(this.params != undefined && this.params != " ") {
+        this.params = this.$route.params.userID;
+        firebase.database().ref('/users/' + firebase.auth().currentUser.uid).once('value').then((snapshot)=> {
+          console.log(snapshot.val());
+          // this.current_user=snapshot.val();
+          this.updateCurrentUser(snapshot);
+          console.log(this.current_user);
+
+        })
+        // this.current_user=firebase.auth().currentUser;
+
+        if(this.params !== undefined && this.params !== " ") {
           //This is when you visit another profile, there is a path param in the route
           //console.log("In getUser call with route params");
-          const userId = this.params.replace(".","");
+          const userId = this.params;
           //console.log("userId", userId);
           this.getUserById(userId);
         }
@@ -118,11 +144,15 @@
         }
 
       },
-
+      updateProfileUser: function(snapshot){
+        this.user=snapshot.val();
+      },
       getUserById: function (userId) {
+
         firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
-            this.user = snapshot.val();
-            //console.log(this.user);
+          this.updateProfileUser(snapshot);
+            console.log(snapshot.val());
+            console.log(this.user);
             //console.log(this.user.following);
 
           }).then(() => {
@@ -138,7 +168,6 @@
 
                 });
               }
-
              if(this.user.hasOwnProperty('groups')) {
 
               this.user.groups.forEach(group => {
@@ -180,40 +209,62 @@
               });
              }
           });
-      }
+      },
+      check_follow: function(){
+        let following_ref=firebase.database().ref().child(`users/${this.current_user.uid}/following`);
+        let current_user_following_data=[];
+        let new_follow_data=this.params;
+
+        following_ref.once('value').then((snapshot)=> {
+          console.log(snapshot);
+          for(let key in snapshot.val()){
+            current_user_following_data.push(snapshot.val()[key]);
+          }
+          if(current_user_following_data.includes(new_follow_data)){
+            this.follow_status='unfollow';
+
+            // changeFollowText('unfollow');
+          }else {
+            this.follow_status='follow';
+          }
+        });
+
+      },
+
 
     },
     mounted: function() {
 
       this.getUser();
+      this.check_follow();
+
     },
     watch: {
-      '$route.params.username': function (username) {
+      '$route.params.userID': function (userID) {
         //console.log("In watched for param: ", username);
-        if(this.params === " ") {
-          //There is no router param so set it equal to who is signed in
-        }
-        this.params = username;
+        // if(this.params === " ") {
+        //   //There is no router param so set it equal to who is signed in
+        // }
+        this.params = userID;
         this.getUser();
+        this.check_follow();
 
       }
     },
     beforeRouteUpdate (to, from, next) {
       if(to.params) {
-        if(to.params.username === " ") {
-          //If the route param is empty
-          //console.log("Param is a space!")
-          this.params = " ";
-          next();
-        }
-        else {
-          const userId = to.params.username.replace(".","");
+        // if(to.params.userID === " ") {
+        //   //If the route param is empty
+        //   //console.log("Param is a space!")
+        //   this.params = " ";
+        //   next();
+        // }
+        // else {
+          const userId = to.params.userID;
           //console.log("BeforeRouteUpdate:", to.params.username);
           this.params = userId;
            next();
-        }
-
-
+        // }
       }
     },
   }
