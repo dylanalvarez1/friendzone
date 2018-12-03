@@ -21,7 +21,7 @@
       </div>
       <div class="grid-item item2">
         <div v-if="group">
-          <h2>{{this.group.groupID}}</h2>
+          <h2>{{this.group.title}}</h2>
           <img :src="group.iconURL" alt="No group icon" style="max-height:300px; max-width:300px;"/><br>
           <p>{{this.group.description}}</p>
         </div>
