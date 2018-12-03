@@ -67,7 +67,11 @@ export default {
       groupName: "",
       groupDescription: "",
       groupPicture: new File(),
-      attemptedSubmission: false
+      attemptedSubmission: false,
+      group_ref:"",
+      group_key:"",
+      room_ref:"",
+      room_key:""
     }
   },
   methods: {
@@ -102,70 +106,92 @@ export default {
       //input verification
       if (!this.isValid()) return;
 
-      //TODO remove
-      alert("form \"submitted\"");
+
+      // alert("form \"submitted\"");
+      // const groupID = this.createGid();
+      // const roomID = groupID;
+
+      // //intialize the group
+      // const newGroup = {
+      //   description: this.groupDescription,
+      //   groupID: groupID,
+      //   iconURL: iconUrl,
+      //   members: [],
+      //   moderators: [],
+      //   ownerID: firebase.auth().currentUser.email.replace(".",""),
+      //   roomID: roomID
+      // };
+      //
+      //
+      // //initialize the room
+      // const newRoom = {
+      //   furnitures: {},
+      //   isGroupRoom: true,
+      //   ownerID: groupID,
+      //   roomID: roomID,
+      //   title: `${this.groupName}'s Room`
+      // };
+      //
+      //
+      //
+      // console.log(newGroup);
+      // console.log(newRoom);
+       this.group_ref=firebase.database().ref('groups').push();
+       this.group_key=this.group_ref.key;
+      this.room_ref=firebase.database().ref('rooms').push();
+      this.room_key=this.room_ref.key;
       const iconUrl = this.uploadPicture();
-      const groupID = this.createGid();
-      const roomID = groupID;
 
-      //intialize the group
-      const newGroup = {
+
+
+      this.group_ref.set({
         description: this.groupDescription,
-        groupID: groupID,
+        title: this.groupName,
+        groupID: this.group_key,
         iconURL: iconUrl,
-        members: [],
-        moderators: [],
-        ownerID: firebase.auth().currentUser.email.replace(".",""),
-        roomID: roomID
-      };
-
-
-      //initialize the room
-      const newRoom = {
+        members: [firebase.auth().currentUser.uid],
+        moderators: [firebase.auth().currentUser.uid],
+        ownerID: firebase.auth().currentUser.uid,
+        roomID: this.room_key
+      })
+      this.room_ref.set({
         furnitures: {},
-        isGroupRoom: true,
-        ownerID: groupID,
-        roomID: roomID,
+        group: true,
+        owner: this.group_key,
+        uid: this.room_key,
         title: `${this.groupName}'s Room`
-      };
+      }).then(() => {
+        let group_key=this.group_key;
+        let current_user_group_data_ref=firebase.database().ref('users').child(firebase.auth().currentUser.uid).child('groups');
+        let current_user_group_data=[];
 
-      //TODO for now, just print out these values.
+        current_user_group_data_ref.once('value').then(function(snapshot){
+          snapshot.forEach(function(child){
+            current_user_group_data.push(child.val());
+          });
+          current_user_group_data.push(group_key);
+          current_user_group_data_ref.set(current_user_group_data);
+        }).then(()=>{
+          this.$router.push({path:`/group/${group_key}`});
+        });
 
-      console.log(newGroup);
-      console.log(newRoom);
-
-      firebase.database().ref('Groups/' + groupID).set({
-        description: this.groupDescription,
-        groupID: groupID,
-        iconURL: iconUrl,
-        members: [],
-        moderators: [],
-        ownerID: firebase.auth().currentUser.email.replace(".",""),
-        roomID: roomID
-      });
-      firebase.database().ref('Rooms/' + roomID).set({
-        furnitures: {},
-        isGroupRoom: true,
-        ownerID: firebase.auth().currentUser.email.replace(".",""),
-        roomID: roomID,
-        title: `${this.groupName}'s Room`
-      });
-      //TODO redirect to group profile page OR edit page OR room. up to you guys.
-      alert("send to group profile page or room");
-
+        // current_user_group_data.push(this.group_key);
+        // firebase.database().ref('users').child('groups').set(current_user_group_data);
+        });
     },
 //https://firebasestorage.googleapis.com/v0/b/friendzone-4930.appspot.com/o/images%2FKonachan_com___238107_2girls_blue_eyes_braids_cevio_ia_kneehighs_long_hair_one__cevio__pink_hair_short_hair_skirt_sotsunaku_thighhighs_vocaloid_1818x1358.jpg?alt=media&token=d4411814-ae75-4612-a591-50b7b309fae9
     uploadPicture: function() {
       const storageRef = firebase.storage().ref();
-      const fullpath = `images/groups/${this.gid}/profilePicture${this.groupPicture.name.substr(this.groupPicture.name.indexOf("."))}`
+      const fullpath = `images/groups/${this.group_key}/profilePicture/${this.groupPicture.name}`;
       const uploadTask = storageRef.child(fullpath).put(this.groupPicture);
-      uploadTask.on('state_changed', snapshot => {}, err => console.log(err), () => console.log('successfully uploaded'));
+      uploadTask.on('state_changed',
+        snapshot => {},
+        err => console.log(err),
+        () => console.log('successfully uploaded'));
       return fullpath;
     },
 
-    createGid: function(){
-      return this.groupName + Date.now();
-    },
+
 
     //This function checks to see if name, desc, and file exists, and that the file is an image file.
     isValid: function() {
