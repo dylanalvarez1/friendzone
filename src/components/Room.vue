@@ -112,23 +112,7 @@ export default {
           url: "https://www.google.com",
           creator: "friendzone",
           dateCreated: Date.now(),
-          position: [0, 0, 0, 0]
-        },
-        {
-          title: "Welcome!",
-          iconUrl: "https://i.imgur.com/dQemleO.jpg?1",
-          url: "https://www.google.com",
-          creator: "friendzone",
-          dateCreated: Date.now(),
-          position: [0, 0, 0, 0]
-        },
-        {
-          title: "Welcome!",
-          iconUrl: "https://i.imgur.com/dQemleO.jpg?1",
-          url: "https://www.google.com",
-          creator: "friendzone",
-          dateCreated: Date.now(),
-          position: [0, 0, 0, 0]
+          position: {top: "0px", left: "0px"}
         }
       ];
       this.saveRoomState(callback);
@@ -144,13 +128,16 @@ export default {
       //place to insert the furniture
       const furnitureContainer = document.getElementById("furniture-container");
         this.room.furniture.forEach((piece, index) => {
+        //[1, 1].forEach((piece, index) => {
           //TODO change href="#"
           const DOG_URL = "https://i.imgur.com/dQemleO.jpg?1";
-          const pieceHTML = `<div class="draggable" style="position: absolute;
+          const pieceHTML = `<div id="furniture-${index}"class="draggable" style="position: absolute;
           z-index: 9;
           background-color: #f1f1f1;
           border: 1px solid #d3d3d3;
-          text-align: center;"><div class="draggableheader" id="furniture-${index}-header"><img src="${DOG_URL}" class="testImage" style="width: 90px; height: 90px"></div></div>`;
+          text-align: center;
+          top: ${piece.position.top}px;
+          left: ${piece.position.left}px;"><div class="draggableheader" id="furniture-${index}-header"><img src="${DOG_URL}" class="testImage" style="width: 90px; height: 90px"></div></div>`;
           furnitureContainer.innerHTML += pieceHTML;
         });
         if (callback) callback();
@@ -201,7 +188,10 @@ export default {
 
     function dragElement(elmnt) {
       console.log("dragElement");
-      var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      const id = elmnt.id.replace("f","");
+      //const position = this.room.furniture[id].position;
+      const position = [0, 0, 0, 0];
+      var pos1 = position[0], pos2 = position[1], pos3 = position[2], pos4 = position[3];
       if (document.getElementById(elmnt.id + "header")) {
         // if present, the header is where you move the DIV from:
         document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
