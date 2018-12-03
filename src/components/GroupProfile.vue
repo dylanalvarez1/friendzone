@@ -113,23 +113,23 @@ export default {
         //console.log(snapshot.val());
         let temp= snapshot.val();
         //console.log("temp", temp);
-        let storage = firebase.storage();
+        // let storage = firebase.storage();
 
         // Create a storage reference from our storage service
-        let storageRef = storage.ref();
+        // let storageRef = storage.ref();
 
         // Create a child reference
-        var imagesRef = storageRef.child('images');
+        // var imagesRef = storageRef.child('images');
         // imagesRef now points to 'images'
         //console.log("part 2");
         //console.log(temp.iconURL);
         // Child references can also take paths delimited by '/'
-        var spaceRef = storageRef.child(temp.iconURL);
+        var spaceRef = firebase.storage().ref().child(temp.iconURL);
         // spaceRef now points to "images/space.jpg"
         // imagesRef still points to "images"
 
         spaceRef.getDownloadURL().then((url) => {
-            let test = url;
+            // let test = url;
             //console.log("url", url);
             temp.iconURL = url;
             //console.log("temp", temp);
