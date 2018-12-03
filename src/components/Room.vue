@@ -114,7 +114,7 @@ export default {
         {
           title: "Welcome!",
           iconUrl: "https://i.imgur.com/dQemleO.jpg?1",
-          url: "https://www.google.com",
+          url: "",
           creator: "friendzone",
           dateCreated: Date.now(),
           position: {top: "0px", left: "0px"}
@@ -142,12 +142,12 @@ export default {
           border: 1px solid #d3d3d3;
           text-align: center;
           top: ${piece.position.top};
-          left: ${piece.position.left};"><div class="draggableheader" id="furniture-${index}-header"><a href="${piece.url}"><img src="${DOG_URL}" class="testImage" style="padding: 10px;
-          cursor: move;
+          left: ${piece.position.left};"><div class="draggableheader" id="furniture-${index}-header" style="cursor: move; padding: 5px;">test</div><a href="${piece.url}"><img src="${DOG_URL}" class="testImage" style="padding: 5px;
+          padding: 25px;
           z-index: 10;
           background-color: #2196F3;
           color: #fff;
-          width: 100px; height: 100px;"></a></div></div>`;
+          width: 100px; height: 100px;"></a></div>`;
           furnitureContainer.innerHTML += pieceHTML;
         });
         if (callback) callback();
