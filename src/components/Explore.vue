@@ -5,7 +5,7 @@
       <button @click="createGroup">Register a new group</button>
       <input placeholder="Search" v-model="query" @keyup.enter="queryDatabase"/>
       <select v-model="selected">
-        <option disabled value="">Please select a filter</option>
+        <option value="" selected disabled hidden>Choose a filter here</option>
         <option value="none">No filter</option>
         <option value="users">Users</option>
         <option value="groups">Groups</option>
@@ -69,34 +69,163 @@
         this.groups = [];
 
         console.log("selected: ", this.selected);
+        if(this.query != "") {
+          if(this.selected == "none") {
+            firebase.database().ref('/groups/').orderByChild("title").equalTo(this.query).once('value').then((snapshot) => {
+              console.log("group serach");
+              let response = snapshot.val();
+              console.log(response);
 
-      if(this.selected == "none") {
-        firebase.database().ref('/groups/'+this.query).once('value').then((snapshot) => {
-          let response = snapshot.val();
-          this.groups = response;
-          console.log("this.results: ", this.results);
-        });
+              console.log("right before the for each");
+              let newResponse = [];
+              Object.entries(response).forEach(group => {
+                console.log("response: ", group);
+                let temp = group[1];
+                console.log("temp before change:", temp);
 
-        firebase.database().ref('/users/'+this.query).once('value').then((snapshot) => {
-          let response = snapshot.val();
-          this.users = response;
-          console.log("this.users: ", this.users);
-        });
-      }
-      else if(this.selected == "groups") {
-         firebase.database().ref('/groups/'+this.query).once('value').then((snapshot) => {
-          let response = snapshot.val();
-          this.groups = response;
-          console.log("this.results: ", this.results);
-        });
-      }
-      else if(this.selected == "users") {
-        firebase.database().ref('/users/'+this.query).once('value').then((snapshot) => {
-          let response = snapshot.val();
-          this.users = response;
-          console.log("this.users: ", this.users);
-        });
-      }
+                this.getDownloadLink(temp.iconURL).then(function (url) {
+                  console.log("callback for download link where url is:", url)
+                  temp.iconURL = url;
+                  console.log("temp2", temp);
+                  newResponse.push(temp);
+                  return newResponse;
+                }).then((newResponse) => {
+                  this.groups = response;
+                  console.log("this.results: ", this.results);
+                });
+
+              });
+            });
+
+            firebase.database().ref('/users/').orderByChild("displayName").equalTo(this.query).once('value').then((snapshot) => {
+              let response = snapshot.val();
+              this.users = response;
+              console.log("this.users: ", this.users);
+            });
+          }
+          else if(this.selected == "groups") {
+            firebase.database().ref('/groups/').orderByChild("title").equalTo(this.query).once('value').then((snapshot) => {
+              console.log("group serach");
+              let response = snapshot.val();
+              console.log(response);
+
+              console.log("right before the for each");
+              let newResponse = [];
+              Object.entries(response).forEach(group => {
+                console.log("response: ", group);
+                let temp = group[1];
+                console.log("temp before change:", temp);
+
+                this.getDownloadLink(temp.iconURL).then(function (url) {
+                  console.log("callback for download link where url is:", url)
+                  temp.iconURL = url;
+                  console.log("temp2", temp);
+                  newResponse.push(temp);
+                  return newResponse;
+                }).then((newResponse) => {
+                  this.groups = response;
+                  console.log("this.results: ", this.results);
+                });
+
+              });
+            });
+          }
+          else if(this.selected == "users") {
+            firebase.database().ref('/users/').orderByChild("displayName").equalTo(this.query).once('value').then((snapshot) => {
+              let response = snapshot.val();
+              this.users = response;
+              console.log("this.users: ", this.users);
+            });
+          }
+        }
+        else {
+          if(this.selected == "none") {
+            firebase.database().ref('/groups/').orderByChild("title").once('value').then((snapshot) => {
+               console.log("group serach");
+              let response = snapshot.val();
+              console.log(response);
+
+              console.log("right before the for each");
+              let newResponse = [];
+              Object.entries(response).forEach(group => {
+                console.log("response: ", group);
+                let temp = group[1];
+                console.log("temp before change:", temp);
+
+                this.getDownloadLink(temp.iconURL).then(function (url) {
+                  console.log("callback for download link where url is:", url)
+                  temp.iconURL = url;
+                  console.log("temp2", temp);
+                  newResponse.push(temp);
+                  return newResponse;
+                }).then((newResponse) => {
+                  this.groups = response;
+                  console.log("this.results: ", this.results);
+                });
+
+              });
+            });
+
+            firebase.database().ref('/users/').orderByChild("displayName").once('value').then((snapshot) => {
+              let response = snapshot.val();
+              this.users = response;
+              console.log("this.users: ", this.users);
+            });
+          }
+          else if(this.selected == "groups") {
+            firebase.database().ref('/groups/').orderByChild("title").once('value').then((snapshot) => {
+              console.log("group serach");
+              let response = snapshot.val();
+              console.log(response);
+
+              console.log("right before the for each");
+              let newResponse = [];
+              Object.entries(response).forEach(group => {
+                console.log("response: ", group);
+                let temp = group[1];
+                console.log("temp before change:", temp);
+
+                this.getDownloadLink(temp.iconURL).then(function (url) {
+                  console.log("callback for download link where url is:", url)
+                  temp.iconURL = url;
+                  console.log("temp2", temp);
+                  newResponse.push(temp);
+                  return newResponse;
+                }).then((newResponse) => {
+                  this.groups = response;
+                  console.log("this.results: ", this.results);
+                });
+
+              });
+
+            });
+          }
+          else if(this.selected == "users") {
+            firebase.database().ref('/users/').orderByChild("displayName").once('value').then((snapshot) => {
+              let response = snapshot.val();
+              this.users = response;
+              console.log("this.users: ", this.users);
+            });
+          }
+        }
+
+    },
+    async getDownloadLink(url) {
+
+
+        let storage = firebase.storage();
+
+        // Create a storage reference from our storage service
+        let storageRef = storage.ref();
+
+        // Create a child reference
+        var imagesRef = storageRef.child('images');
+
+        // Child references can also take paths delimited by '/'
+        var spaceRef = storageRef.child(url);
+
+        return await spaceRef.getDownloadURL();
+
     }
   },
 
