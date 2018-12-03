@@ -10,6 +10,8 @@
         <option value="users">Users</option>
         <option value="groups">Groups</option>
       </select>
+      <p v-if="!checked">Grid View</p>
+      <p v-else>Table View</p>
       <!-- Rounded switch -->
       <label class="switch">
         <input type="checkbox" id="checkbox" v-model="checked">
@@ -274,29 +276,42 @@
     position: absolute;
     height: 100%;
     width: 98.9%;
-    background-color: #2196F3;
+
   }
 
 
 
   .container {
     position: relative;
+    padding-top: 100px;
     display: inline;
   }
 
   .container button {
-    margin-right: 20%;
+    margin-right: 15%;
     margin-left: 5%;
     height: 30px;
-    border-radius: 5px;
+    display: inline-block;
+
   }
 
   .container input {
     height: 30px; width: 30%;
+    margin-right: 5%;
+    display: inline-block;
+  }
+
+  .container #checkbox {
+    margin-right: 5% !important;
+  }
+
+  .container p {
+    display: inline-block;
   }
 
   .container select {
-    margin-left: 5%;
+    margin-right: 5%;
+    display: inline-block;
   }
 
   #resultSet{
@@ -362,8 +377,10 @@
 .switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
+  width: 50px;
+  height: 22px;
+  margin-left: 4px;
+
 }
 
 /* Hide default HTML checkbox */
@@ -389,10 +406,10 @@
 .slider:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
+  height: 15px;
+  width: 15px;
   left: 4px;
-  bottom: 4px;
+  bottom: 3px;
   background-color: white;
   -webkit-transition: .4s;
   transition: .4s;
@@ -407,9 +424,9 @@ input:focus + .slider {
 }
 
 input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
+  -webkit-transform: translateX(27px);
+  -ms-transform: translateX(27px);
+  transform: translateX(27px);
 }
 
 /* Rounded sliders */
