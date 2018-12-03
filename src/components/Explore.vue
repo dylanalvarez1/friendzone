@@ -3,8 +3,9 @@
 
     <div class="container" style="display: inline; float: left; width: 100%; margin-top: 50px;">
       <button @click="createGroup">Register a new group</button>
-      <input placeholder="Search" style=""/>
-      <select style="">
+      <input placeholder="Search" v-model="query" @keyup.enter="queryDatabase"/>
+      <select v-model="selected">
+        <option disabled value="">Please select a filter</option>
         <option value="none">No filter</option>
         <option value="users">Users</option>
         <option value="groups">Groups</option>
@@ -14,11 +15,19 @@
 
       <div id="resultSet">
         <h1 style="color: white;">Results</h1>
-      <div id="resultsList" v-for="result in results" :key="result.name" class="container" @click="goToPage(result.name)">
-        <img id="icon" :src="result.url" alt="Avatar" class="image friendPic">
+      <div id="resultsList" v-for="user in users" :key="user.uid" class="container" @click="goToUserPage(user.uid)">
+        <img id="icon" :src="user.photoURL" alt="Avatar" class="image friendPic">
         <div class="middle iconLabel">
           <div id="iconLabel" class="text">
-            {{result.name}}
+            {{user.displayName}}
+          </div>
+        </div>
+      </div>
+       <div id="resultsList" v-for="group in groups" :key="group.groupID" class="container" @click="goToGroupPage(group.groupID)">
+        <img id="icon" :src="group.iconURL" alt="Avatar" class="image friendPic">
+        <div class="middle iconLabel">
+          <div id="iconLabel" class="text">
+            {{group.description}}
           </div>
         </div>
       </div>
@@ -35,78 +44,68 @@
       return {
         username: "",
         uid: "",
-        results: undefined
+        results: [],
+        users: [],
+        groups: [],
+        selected: "",
+        query: ""
       }
     },
 
     methods: {
       //for traversing to each user / groups page
-      goToPage: function(name) {
-        alert(name);
+      goToUserPage: function(name) {
+        this.$router.push({ path: `/home/${name}` });
+      },
+      goToGroupPage: function(name) {
+        this.$router.push({ path: `/group/${name}` });
       },
       createGroup: function() {
        this.$router.push({ path: `/group-registration/` });
+      },
+      queryDatabase: function() {
+        this.results = [];
+        this.users = [];
+        this.groups = [];
+
+        console.log("selected: ", this.selected);
+
+      if(this.selected == "none") {
+        firebase.database().ref('/groups/'+this.query).once('value').then((snapshot) => {
+          let response = snapshot.val();
+          this.groups = response;
+          console.log("this.results: ", this.results);
+        });
+
+        firebase.database().ref('/users/'+this.query).once('value').then((snapshot) => {
+          let response = snapshot.val();
+          this.users = response;
+          console.log("this.users: ", this.users);
+        });
       }
-    },
+      else if(this.selected == "groups") {
+         firebase.database().ref('/groups/'+this.query).once('value').then((snapshot) => {
+          let response = snapshot.val();
+          this.groups = response;
+          console.log("this.results: ", this.results);
+        });
+      }
+      else if(this.selected == "users") {
+        firebase.database().ref('/users/'+this.query).once('value').then((snapshot) => {
+          let response = snapshot.val();
+          this.users = response;
+          console.log("this.users: ", this.users);
+        });
+      }
+    }
+  },
 
     mounted: function() {
-      let r1 = {
-        "name": "result1",
-        "id": 1,
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
-      };
-      let r2 = {
-        "name": "result2",
-        "id": 2,
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
-      };
-      let r3 = {
-        "name": "result3",
-        "id": 3,
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
-      };
-      let r4 = {
-        "name": "result4",
-        "id": 4,
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
-      };
-      let r5 = {
-        "name": "result5",
-        "id": 5,
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
-      };
-
-      let r6 = {
-        "name": "result6",
-        "id": 6,
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
-      };
-      let r7 = {
-        "name": "result7",
-        "id": 7,
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
-      };
-      let r8 = {
-        "name": "result8",
-        "id": 8,
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
-      };
-      let r9 = {
-        "name": "result9",
-        "id": 9,
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
-      };
-      let r10 = {
-        "name": "result10",
-        "id": 10,
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg"
-      };
-
       let currentUser = firebase.auth().currentUser;
       //console.log(currentUser);
       this.username = currentUser.email;
       this.uid = currentUser.uid;
-      this.results = new Array(r1, r2, r3, r4, r5, r6, r7, r8, r9, r10);
+
     }
   }
 </script>
