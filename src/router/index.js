@@ -61,7 +61,7 @@ let router = new Router({
       }
     },
     {
-      path: '/group',
+      path: '/group/:id',
       name: 'group',
       component: GroupProfile,
       meta: {
@@ -69,15 +69,12 @@ let router = new Router({
       }
     },
     {
-      path: '/room',
+      path: '/room/:username?',
       name: 'room',
       component: RoomComponent,
       meta: {
         requiresAuth: true
       },
-      props: (route) => ({
-        username: route.query.username,
-      })
     }
   ]
 })

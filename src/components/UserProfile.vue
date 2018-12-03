@@ -16,12 +16,17 @@
     <div v-if="user" class="grid-item item2">
       <h2 v-if="user.displayName">{{this.user.displayName}}</h2>
       <p v-if="user.email">{{this.user.email}}</p>
-      <img v-if="user.photoURL" :src="user.photoURL" /><br>
+      <img v-if="user.photoURL" :src="user.photoURL" alt="no profile image" style="max-height:300px; max-width:300px;" /><br>
     </div>
     <div class="grid-item item3">
-      <div><p id="friendLabel">Friends:</p>
-          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToFollowedPage(friend.email)">
+      <div><p id="friendLabel">Following:</p>
+          <div id="friendList" v-for="friend in friends" :key="friend.displayName" class="container" @click="goToFollowedPage(friend.uid)">
             <Icon :url="friend.photoURL" :label="friend.displayName"></Icon>
+          </div>
+      </div>
+      <div><p id="groupLabel">Groups:</p>
+          <div id="groupList" v-for="group in groups" :key="group.groupID" class="container" @click="goToGroupPage(group.groupID)">
+            <Icon :url="group.iconURL" :label="group.groupID"></Icon>
           </div>
       </div>
 
@@ -42,9 +47,11 @@ import Icon from '@/components/Icon'
          "photoURL": "",
          "displayName": "",
          "email": "",
-         "friends": []
+         "friends": [],
+         "groups": [],
        },
        friends: [],
+       groups: [],
        params: undefined,
 
       }
@@ -58,11 +65,11 @@ import Icon from '@/components/Icon'
         alert("Go to " + name + "'s room?");
       },
       goToFollowedPage: function(name) {
-        console.log("name", name);
+        //console.log("name", name);
         this.$router.push({ path: `/home/${name}` });
       },
       goToGroupPage: function(name) {
-        alert(name);
+        this.$router.push({ path: `/group/${name}` });
       },
       followUser: function(name) {
         alert("Follow " + name + "?");
@@ -75,21 +82,22 @@ import Icon from '@/components/Icon'
         //Gets the correct user by checking if there is a router param and then calls getUserById (firebase call)
 
         //console.log("route params:", this.$route.params.username);
+        this.params = this.$route.params.username;
 
 
         if(this.params != undefined && this.params != " ") {
           //This is when you visit another profile, there is a path param in the route
-          console.log("In getUser call with route params");
+          //console.log("In getUser call with route params");
           const userId = this.params.replace(".","");
-          console.log("userId", userId);
+          //console.log("userId", userId);
           this.getUserById(userId);
         }
 
         else {
           //default call with no router params
-          console.log("In getUser call where there is no route params");
-          const userId = firebase.auth().currentUser.email.replace(".","");
-          console.log("userId", userId);
+          //console.log("In getUser call where there is no route params");
+          const userId = firebase.auth().currentUser.uid;
+          //console.log("userId", userId);
           this.getUserById(userId);
         }
 
@@ -99,14 +107,54 @@ import Icon from '@/components/Icon'
         firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
             this.user = snapshot.val();
             //console.log(this.user);
-            console.log(this.user.friends);
+            //console.log(this.user.following);
 
           }).then(() => {
               this.friends = []; //empty the array before filling it with user info
-              this.user.friends.forEach(friend => {
+              this.groups = [];
+              this.user.following.forEach(friend => {
                 let tempId = friend.replace(".","");
                 firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
                 this.friends.push(snapshot.val());
+
+                });
+
+              });
+
+              this.user.groups.forEach(group => {
+                //console.log("for each group:")
+                let tempId = group.replace(".","");
+                firebase.database().ref('/groups/' + tempId).once('value').then((snapshot) => {
+                  let temp = snapshot.val();
+                  //console.log("Group: ", temp);
+                  // Get a reference to the storage service, which is used to create references in your storage bucket
+                  let storage = firebase.storage();
+
+                  // Create a storage reference from our storage service
+                  let storageRef = storage.ref();
+
+                  // Create a child reference
+                  var imagesRef = storageRef.child('images');
+                  // imagesRef now points to 'images'
+
+                  // Child references can also take paths delimited by '/'
+                  var spaceRef = storageRef.child(temp.iconURL);
+                  // spaceRef now points to "images/space.jpg"
+                  // imagesRef still points to "images"
+
+                  spaceRef.getDownloadURL().then((url) => {
+                      let test = url;
+                      //console.log("url", url);
+                      temp.iconURL = url;
+                      //console.log("temp", temp);
+                      this.groups.push(temp);
+
+                  }).catch(function(error) {
+
+                  });
+
+
+
 
                 });
 
@@ -121,7 +169,7 @@ import Icon from '@/components/Icon'
     },
     watch: {
       '$route.params.username': function (username) {
-        console.log("In watched for param: ", username);
+        //console.log("In watched for param: ", username);
         if(this.params === " ") {
           //There is no router param so set it equal to who is signed in
         }
@@ -134,13 +182,13 @@ import Icon from '@/components/Icon'
       if(to.params) {
         if(to.params.username === " ") {
           //If the route param is empty
-          console.log("Param is a space!")
+          //console.log("Param is a space!")
           this.params = " ";
           next();
         }
         else {
           const userId = to.params.username.replace(".","");
-          console.log("BeforeRouteUpdate:", to.params.username);
+          //console.log("BeforeRouteUpdate:", to.params.username);
           this.params = userId;
            next();
         }

@@ -152,12 +152,9 @@
     color: black !important;
   }
 
-  input[type="password"]::-moz-placeholder {
-    color: #ff7895 !important;
-  }
 
   input[type="text"]:-ms-input-placeholder {
-    color: #ff7895 !important;
+    color: black !important;
   }
 
   .register-input {

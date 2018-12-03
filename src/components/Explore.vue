@@ -2,7 +2,7 @@
   <div id="background">
 
     <div class="container" style="display: inline; float: left; width: 100%; margin-top: 50px;">
-      <button @click="$router.replace('group-registration')">Register a new group</button>
+      <button @click="createGroup">Register a new group</button>
       <input placeholder="Search" style=""/>
       <select style="">
         <option value="none">No filter</option>
@@ -43,6 +43,9 @@
       //for traversing to each user / groups page
       goToPage: function(name) {
         alert(name);
+      },
+      createGroup: function() {
+       this.$router.push({ path: `/group-registration/` });
       }
     },
 
@@ -118,8 +121,6 @@
 
   .container {
     position: relative;
-    width: 5%;
-    float: left;
     display: inline;
   }
 
@@ -127,7 +128,7 @@
     margin-right: 20%;
     margin-left: 5%;
     height: 30px;
-    corner-radius: 10px;
+    border-radius: 5px;
   }
 
   .container input {
