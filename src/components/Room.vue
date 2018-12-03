@@ -12,7 +12,11 @@
       </div>
     </div-->
   </div>
-  <div class="item3">Controls:</div>
+  <div class="item3">Decorate:
+    <button @click="createFurniture">Add furniture</button>
+    <button>Modify furniture</button>
+    <button>Delete furniture</button>
+  </div>
   <div class="item4">footer:</div>
 </div>
 </template>
@@ -38,7 +42,8 @@ export default {
          "email": "",
          "friends": []
        },*/
-      params: undefined
+      params: undefined,
+      furniture: []
     }
   },
   props: ['username'],
@@ -98,6 +103,7 @@ export default {
           if (!this.room.furniture) this.initializeFurniture(callback);
           //else callback();
 
+          this.furniture = this.room.furniture;
 
 
 
@@ -121,6 +127,28 @@ export default {
         }
       ];
       this.saveRoomState(callback);
+    },
+
+    createFurniture: function() {
+      let currentRoom = this.room;
+      let defaultFurniture = {
+        title: "Welcome!",
+        iconUrl: "https://i.imgur.com/dQemleO.jpg?1",
+        url: "",
+        creator: "friendzone",
+        dateCreated: Date.now(),
+        position: {top: "0px", left: "0px"}
+      };
+      let tempList = this.room.furniture;
+      console.log(tempList);
+      tempList.push(defaultFurniture);
+      this.furniture = tempList;
+      currentRoom.furniture = tempList;
+
+      this.room = currentRoom;
+      this.saveRoomState(this.renderFurniture());
+
+
     },
 
     saveRoomState: function(callback) {
@@ -317,9 +345,20 @@ export default {
 
 
 
+  },
+
+  watched: {
+    furniture: {
+      handler: function () {
+        console.log("room has changed!");
+        this.renderFurniture();
+      },
+      deep: true
+    }
   }
 
-  }
+
+}
 
   </script>
 
