@@ -1,12 +1,12 @@
 <template>
   <div id="background">
-
+    <h1 id="title">Search for a user or group:</h1>
+    <hr>
     <div class="container" style="display: inline; float: left; width: 100%; margin-top: 50px;">
       <button @click="createGroup">Register a new group</button>
       <input placeholder="Search" v-model="query" @keyup.enter="queryDatabase"/>
-      <select v-model="selected">
-        <option value="" selected disabled hidden>Choose a filter here</option>
-        <option value="none">No filter</option>
+      <select @change="queryDatabase" v-model="selected">
+        <option selected value="">No filter</option>
         <option value="users">Users</option>
         <option value="groups">Groups</option>
       </select>
@@ -102,7 +102,7 @@
 
         console.log("selected: ", this.selected);
         if(this.query != "") {
-          if(this.selected == "none") {
+          if(this.selected == "") {
             firebase.database().ref('/groups/').orderByChild("title").equalTo(this.query).once('value').then((snapshot) => {
               console.log("group serach");
               let response = snapshot.val();
@@ -171,7 +171,7 @@
           }
         }
         else {
-          if(this.selected == "none") {
+          if(this.selected == "") {
             firebase.database().ref('/groups/').orderByChild("title").once('value').then((snapshot) => {
                console.log("group serach");
               let response = snapshot.val();
@@ -272,6 +272,11 @@
 </script>
 
 <style scoped>
+
+  #title {
+    text-align: center;
+  }
+
   #background {
     position: absolute;
     height: 100%;
