@@ -30,7 +30,6 @@ export default {
       pos2: 0,
       pos3: 0,
       pos4: 0,
-      piece: 0,
       room: "",
       activeFurnitureIndex: -1,
       /*user : {
@@ -92,6 +91,7 @@ export default {
         .then(snapshot => {
           //set the room
           this.room = snapshot.val();
+          this.pieces = this.room.furniture;
           console.log("snapshot.val()" + snapshot.val());
 
           //initialize room furniture if nonexistent
@@ -142,7 +142,12 @@ export default {
           border: 1px solid #d3d3d3;
           text-align: center;
           top: ${piece.position.top};
-          left: ${piece.position.left};"><div class="draggableheader" id="furniture-${index}-header"><img src="${DOG_URL}" class="testImage" style="width: 90px; height: 90px"></div></div>`;
+          left: ${piece.position.left};"><div class="draggableheader" id="furniture-${index}-header"><a href="${piece.url}"><img src="${DOG_URL}" class="testImage" style="padding: 10px;
+          cursor: move;
+          z-index: 10;
+          background-color: #2196F3;
+          color: #fff;
+          width: 100px; height: 100px;"></a></div></div>`;
           furnitureContainer.innerHTML += pieceHTML;
         });
         if (callback) callback();
@@ -172,19 +177,68 @@ export default {
     },
 
     dragElement: function(elmnt){
-      this.elmnt = elmnt;
-      console.log("dragElement");
+      let position = [0,0,0,0];
       const index = elmnt.id.replace("furniture-","");
-      this.piece = this.room.furniture[index];
-      //const position = this.room.furniture[id].position;
-      const position = [0, 0, 0, 0];
-      this.pos1 = position[0], this.pos2 = position[1], this.pos3 = position[2], this.pos4 = position[3];
-      if (document.getElementById(elmnt.id + "header")) {
+      console.log("dragElement");
+      if (document.getElementById(elmnt.id + "-header")) {
         // if present, the header is where you move the DIV from:
-        document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+        document.getElementById(elmnt.id + "-header").onmousedown = e => {
+          e = e || window.event;
+          e.preventDefault();
+          // get the mouse cursor position at startup:
+          position[2] = e.clientX;
+          position[3] = e.clientY;
+          document.onmouseup = () => {
+            document.onmouseup = null;
+            document.onmousemove = null;
+            this.saveRoomState();
+          };
+          // call a function whenever the cursor moves:
+          document.onmousemove = e => {
+            e = e || window.event;
+            e.preventDefault();
+            // calculate the new cursor position:
+            position[0] = position[2] - e.clientX;
+            position[1] = position[3] - e.clientY;
+            position[2] = e.clientX;
+            position[3] = e.clientY;
+            // set the element's new position:
+            elmnt.style.top = (elmnt.offsetTop - position[1]) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - position[0]) + "px";
+            this.room.furniture[index].position.top = elmnt.style.top;
+            this.room.furniture[index].position.left = elmnt.style.left;
+          };
+        };
       } else {
         // otherwise, move the DIV from anywhere inside the DIV:
-        elmnt.onmousedown = this.dragMouseDown;
+        this.elmnt.onmousedown = e => {
+          e = e || window.event;
+          e.preventDefault();
+          // get the mouse cursor position at startup:
+          this.pos3 = e.clientX;
+          this.pos4 = e.clientY;
+          document.onmouseup = () => {
+            document.onmouseup = null;
+            document.onmousemove = null;
+            this.saveRoomState();
+          };
+          // call a function whenever the cursor moves:
+          document.onmousemove = e => {
+            e = e || window.event;
+            e.preventDefault();
+            // calculate the new cursor position:
+            position[0] = position[2] - e.clientX;
+            position[1] = position[3] - e.clientY;
+            position[2] = e.clientX;
+            position[3] = e.clientY;
+            // set the element's new position:
+            elmnt.style.top = (elmnt.offsetTop - position[1]) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - position[0]) + "px";
+            this.room.furniture[index].position.top = elmnt.style.top;
+            this.room.furniture[index].position.left = elmnt.style.left;
+            //console.log(this.piece.position.left + ", " + this.piece.position.top);
+          };
+        };
       }
     },
 
@@ -194,9 +248,27 @@ export default {
       // get the mouse cursor position at startup:
       this.pos3 = e.clientX;
       this.pos4 = e.clientY;
-      document.onmouseup = this.closeDragElement;
+      document.onmouseup = () => {
+        document.onmouseup = null;
+        document.onmousemove = null;
+        this.saveRoomState();
+      };
       // call a function whenever the cursor moves:
-      document.onmousemove = this.elementDrag;
+      document.onmousemove = e => {
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor position:
+        position[0] = position[2] - e.clientX;
+        position[1] = position[3] - e.clientY;
+        position[2] = e.clientX;
+        position[3] = e.clientY;
+        // set the element's new position:
+        elmnt.style.top = (elmnt.offsetTop - position[1]) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - position[0]) + "px";
+        this.room.furniture[index].position.top = elmnt.style.top;
+        this.room.furniture[index].left = elmnt.style.left;
+        //console.log(this.piece.position.left + ", " + this.piece.position.top);
+      };
     },
 
     elementDrag: function(e) {
@@ -212,6 +284,7 @@ export default {
       this.elmnt.style.left = (this.elmnt.offsetLeft - this.pos1) + "px";
       this.piece.position.top = this.elmnt.style.top;
       this.piece.position.left = this.elmnt.style.left;
+      console.log(this.piece.position.left + ", " + this.piece.position.top);
     },
 
     closeDragElement: function() {
@@ -243,53 +316,11 @@ export default {
     //document.getElementsByClassName("draggable").forEach(elmnt => dragElement(elmnt));
 
 
-    function dragElement(elmnt) {
-      console.log("dragElement");
-      const id = elmnt.id.replace("f","");
-      //const position = this.room.furniture[id].position;
-      const position = [0, 0, 0, 0];
-      var pos1 = position[0], pos2 = position[1], pos3 = position[2], pos4 = position[3];
-      if (document.getElementById(elmnt.id + "header")) {
-        // if present, the header is where you move the DIV from:
-        document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
-      } else {
-        // otherwise, move the DIV from anywhere inside the DIV:
-        elmnt.onmousedown = dragMouseDown;
-      }
 
-      function dragMouseDown(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // get the mouse cursor position at startup:
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        // call a function whenever the cursor moves:
-        document.onmousemove = elementDrag;
-      }
-
-      function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // calculate the new cursor position:
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        // set the element's new position:
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-      }
-
-      function closeDragElement() {
-        // stop moving when mouse button is released:
-        document.onmouseup = null;
-        document.onmousemove = null;
-      }
-  }
   }
 
   }
+
   </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
