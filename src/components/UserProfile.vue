@@ -1,7 +1,7 @@
 <template>
 <div>
   <div class="grid-container">
-    <div class="grid-item item1">
+    <div v-if="current_user.uid!==params" class="grid-item item1">
       <div @click="followUser(user.displayName)">
         <img src="../assets/logo.png" style="width: 50px; height: 50px"/>
         <p>Follow</p>
@@ -13,7 +13,8 @@
         <p>Go to room</p>
       </div>
     </div>
-    <div v-if="user" class="grid-item item2">
+
+    <div  class="grid-item item2">
       <h2 v-if="user.displayName">{{this.user.displayName}}</h2>
       <p v-if="user.email">{{this.user.email}}</p>
       <img v-if="user.photoURL" :src="user.photoURL" alt="no profile image" style="max-height:300px; max-width:300px;" /><br>
@@ -37,8 +38,9 @@
 </template>
 
 <script>
-import firebase from 'firebase'
-import Icon from '@/components/Icon'
+  import firebase from 'firebase'
+
+  import Icon from '@/components/Icon'
   export default {
     name: 'login',
     data: function() {
@@ -53,6 +55,7 @@ import Icon from '@/components/Icon'
        friends: [],
        groups: [],
        params: undefined,
+       current_user: null
 
       }
     },
@@ -72,18 +75,31 @@ import Icon from '@/components/Icon'
         this.$router.push({ path: `/group/${name}` });
       },
       followUser: function(name) {
-        alert("Follow " + name + "?");
+        // alert("Follow " + name + "?");
+        let following_ref=firebase.database().ref().child(`users/${this.current_user.uid}/following`);
+        let current_user_following_data=[];
+        let new_follow_data=this.params;
+        following_ref.once('value').then(function(snapshot) {
+          snapshot.forEach(function (child) {
+            current_user_following_data.push(child.val());
+          });
+          current_user_following_data.push(new_follow_data);
+          following_ref.set(current_user_following_data);
+        });
+
       },
       goToRoom: function(name) {
-        alert("Now entering " + name + "'s room");
+        // alert("Now entering " + name + "'s room");
+        this.$router.push({ path: `/room/${firebase.auth().currentUser.uid}` });
+
       },
 
       getUser: function() {
         //Gets the correct user by checking if there is a router param and then calls getUserById (firebase call)
 
         //console.log("route params:", this.$route.params.username);
-        this.params = this.$route.params.username;
-
+        this.params = this.$route.params.userID;
+        this.current_user=firebase.auth().currentUser;
 
         if(this.params != undefined && this.params != " ") {
           //This is when you visit another profile, there is a path param in the route
@@ -112,18 +128,22 @@ import Icon from '@/components/Icon'
           }).then(() => {
               this.friends = []; //empty the array before filling it with user info
               this.groups = [];
-              this.user.following.forEach(friend => {
-                let tempId = friend.replace(".","");
-                firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
-                this.friends.push(snapshot.val());
+              if(this.user.hasOwnProperty('following')) {
+                this.user.following.forEach(friend => {
+                  let tempId = friend.replace(".", "");
+                  firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
+                    this.friends.push(snapshot.val());
+
+                  });
 
                 });
+              }
 
-              });
+             if(this.user.hasOwnProperty('groups')) {
 
               this.user.groups.forEach(group => {
                 //console.log("for each group:")
-                let tempId = group.replace(".","");
+                let tempId = group.replace(".", "");
                 firebase.database().ref('/groups/' + tempId).once('value').then((snapshot) => {
                   let temp = snapshot.val();
                   //console.log("Group: ", temp);
@@ -143,22 +163,22 @@ import Icon from '@/components/Icon'
                   // imagesRef still points to "images"
 
                   spaceRef.getDownloadURL().then((url) => {
-                      let test = url;
-                      //console.log("url", url);
-                      temp.iconURL = url;
-                      //console.log("temp", temp);
-                      this.groups.push(temp);
+                    let test = url;
+                    //console.log("url", url);
+                    temp.iconURL = url;
+                    //console.log("temp", temp);
+                    this.groups.push(temp);
 
-                  }).catch(function(error) {
+                  }).catch(function (error) {
 
                   });
 
 
-
-
                 });
 
+
               });
+             }
           });
       }
 

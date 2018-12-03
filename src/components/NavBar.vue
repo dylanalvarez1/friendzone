@@ -27,12 +27,12 @@ import firebase from 'firebase'
       },
       toProfile: function() {
         console.log("To home!");
-        let space = " ";
+        let space = firebase.auth().currentUser.uid;
         this.$router.push({ path: `/home/${space}` });
       },
       toRoom: function() {
-        console.log("To home!");
-        this.$router.push({ path: `/room/test@memecom` });
+        console.log("To room!");
+        this.$router.push({ path: `/room/${firebase.auth().currentUser.uid}` });
       },
       toExplore: function() {
         console.log("To explore!");

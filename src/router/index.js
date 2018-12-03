@@ -26,7 +26,7 @@ let router = new Router({
       redirect: '/login'
     },
     {
-      path: '/home/:username?',
+      path: '/home/:userID?',
       name: 'Home',
       component: UserProfile,
       meta: {
@@ -69,7 +69,7 @@ let router = new Router({
       }
     },
     {
-      path: '/room/:username?',
+      path: '/room/:ownerID',
       name: 'room',
       component: RoomComponent,
       meta: {
@@ -86,9 +86,20 @@ router.beforeEach((to, from, next) => {
 
   //we use .some() in case there are nested routes
 
-  if(requiresAuth && !currentUser) next('login');
-   else if(!requiresAuth&&currentUser) next('home');
-  else next();
+  if(!currentUser && (to.path === '/login'||to.path==='/sign-up' )){
+    next();
+  }else if(!currentUser && requiresAuth){
+    next(`/login`);
+  }
+  //  else if(requiresAuth&&currentUser) {
+  //   // next(`/home/${currentUser.uid}`);
+  //   next();
+  // }
+  else {
+    next();
+      // next(`/home/${currentUser.uid}`);
+
+  }
 })
 
 export default router;
