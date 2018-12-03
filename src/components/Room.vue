@@ -146,7 +146,15 @@ export default {
       currentRoom.furniture = tempList;
 
       this.room = currentRoom;
-      this.saveRoomState(this.renderFurniture());
+      this.saveRoomState(this.renderFurniture(() => {
+        //Make all the elements draggable
+        const elmnts = document.getElementsByClassName("draggable");
+        console.log(elmnts.length);
+        for (let i = 0; i < elmnts.length; i++){
+          console.log(i);
+          this.dragElement(elmnts[i]);
+        }
+      }));
 
 
     },
