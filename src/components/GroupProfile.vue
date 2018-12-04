@@ -72,6 +72,8 @@ export default {
     joinGroup: function(groupID) {
       // alert('Joined '+groupName);
       let group_member_ref=firebase.database().ref().child(`groups/${groupID}/members`);
+      let current_user_ref=firebase.database().ref().child(`users/${firebase.auth().currentUser.uid}/groups`);
+
       let current_group_member_data=[];
       let user_uid=firebase.auth().currentUser.uid;
       group_member_ref.once('value').then(function(snapshot) {
@@ -81,16 +83,35 @@ export default {
         });
         if(current_group_member_data.includes(user_uid)){
           current_group_member_data.splice(current_group_member_data.indexOf(user_uid),1);
+
+
+
         }else {
           current_group_member_data.push(user_uid);
         }
         group_member_ref.set(current_group_member_data);
       });
+      let current_user_group_data=[];
+
+      current_user_ref.once('value').then((snapshot)=>{
+        snapshot.forEach(function (child) {
+          current_user_group_data.push(child.val());
+        });
+        if(current_user_group_data.includes(groupID)){
+          current_user_group_data.splice(current_user_group_data.indexOf(groupID),1);
+        }else {
+          current_user_group_data.push(groupID);
+        }
+        current_user_ref.set(current_user_group_data);
+      });
+
       if(this.group_status==="join group"){
         this.group_status="leave group";
       }else if(this.group_status==="leave group"){
         this.group_status="join group";
       }
+      this.getGroupById(groupID);
+
     },
     goToRoom: function(name) {
       alert("Now entering " + name + "'s room");
