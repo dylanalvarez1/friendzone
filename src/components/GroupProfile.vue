@@ -1,10 +1,10 @@
 <template>
   <div class="groupProfile">
     <div class="grid-container">
-      <div class="grid-item item1">
-        <div @click="joinGroup(group.groupID)">
+      <div class="grid-item item1" @click="joinGroup(group.groupID)">
+        <div >
           <img src="../assets/logo.png" style="width: 50px; height: 50px"/>
-          <p>Join group</p>
+          <p>{{group_status}}</p>
         </div>
       </div>
       <div class="grid-item item4">
@@ -62,14 +62,35 @@ export default {
       admins: undefined,
       group: undefined,
       params: "",
+      group_status:"join group"
     }
   },
   components: {
       Icon,
     },
   methods: {
-    joinGroup: function(groupName) {
-      alert('Joined '+groupName);
+    joinGroup: function(groupID) {
+      // alert('Joined '+groupName);
+      let group_member_ref=firebase.database().ref().child(`groups/${groupID}/members`);
+      let current_group_member_data=[];
+      let user_uid=firebase.auth().currentUser.uid;
+      group_member_ref.once('value').then(function(snapshot) {
+
+        snapshot.forEach(function (child) {
+          current_group_member_data.push(child.val());
+        });
+        if(current_group_member_data.includes(user_uid)){
+          current_group_member_data.splice(current_group_member_data.indexOf(user_uid),1);
+        }else {
+          current_group_member_data.push(user_uid);
+        }
+        group_member_ref.set(current_group_member_data);
+      });
+      if(this.group_status==="join group"){
+        this.group_status="leave group";
+      }else if(this.group_status==="leave group"){
+        this.group_status="join group";
+      }
     },
     goToRoom: function(name) {
       alert("Now entering " + name + "'s room");
@@ -163,12 +184,32 @@ export default {
 
 
 
+    },
+
+    alterGroupStatus: function(){
+      let group_member_ref=firebase.database().ref().child(`groups/${this.params}/members`);
+      let current_group_member_data=[];
+      let user_uid=firebase.auth().currentUser.uid;
+      group_member_ref.once('value').then(snapshot=> {
+
+        snapshot.forEach(function (child) {
+          current_group_member_data.push(child.val());
+        });
+        if(current_group_member_data.includes(user_uid)){
+          this.group_status=("leave group");
+        }else {
+          this.group_status=("join group");
+        }
+        group_member_ref.set(current_group_member_data);
+      });
+
     }
 
   },
 
  mounted: function() {
     this.getGroup();
+    this.alterGroupStatus();
   },
 
   watch: {
@@ -176,6 +217,7 @@ export default {
       //console.log("In watched for param: ", id);
       this.params = id;
       this.getGroup();
+      this.alterGroupStatus();
 
     }
   },
