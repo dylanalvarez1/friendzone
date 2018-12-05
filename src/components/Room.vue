@@ -2,7 +2,7 @@
 <div class="grid-container">
   <div class="item1">header:
     <div>
-      {{room}}
+      {{activeFurnitureIndex}}
     </div>
   </div>
   <div id="furniture-container" class="item2">Room:
@@ -115,7 +115,6 @@ export default {
     },
 
     initializeFurniture: function(callback) {
-      //TODO initialize with a default furniture instead of {name:"Hello"}
       this.room.furniture = [
         {
           title: "Welcome!",
@@ -149,11 +148,6 @@ export default {
       this.saveRoomState(this.renderFurniture(() => {
         //Make all the elements draggable
         const elmnts = document.getElementsByClassName("draggable");
-        console.log(elmnts.length);
-        for (let i = 0; i < elmnts.length; i++){
-          console.log(i);
-          this.dragElement(elmnts[i]);
-        }
       }));
 
 
@@ -161,7 +155,7 @@ export default {
 
     saveRoomState: function(callback) {
       firebase.database().ref(`/rooms/${GROUP_ID}`).set(this.room);
-      console.log("saving " + JSON.stringify(this.room));
+      //console.log("saving " + JSON.stringify(this.room));
       if (callback) callback();
     },
 
@@ -169,8 +163,6 @@ export default {
       //place to insert the furniture
       const furnitureContainer = document.getElementById("furniture-container");
         this.room.furniture.forEach((piece, index) => {
-        //[1, 1].forEach((piece, index) => {
-          //TODO change href="#"
           const DOG_URL = "https://i.imgur.com/dQemleO.jpg?1";
           const pieceHTML = `<div id="furniture-${index}"class="draggable" style="position: absolute;
           z-index: 9;
@@ -187,29 +179,6 @@ export default {
           furnitureContainer.innerHTML += pieceHTML;
         });
         if (callback) callback();
-        //this.makeDraggable(`${index}`);
-    },
-
-    setCookie: function(cname, cvalue) {
-      var d = new Date();
-      var expires = "expires=" + d.toUTCString();
-      document.cookie = cname + "=" + cvalue + ";";
-    },
-
-    getCookie: function(cname) {
-      var name = cname + "=";
-      var decodedCookie = decodeURIComponent(document.cookie);
-      var ca = decodedCookie.split(';');
-      for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-          c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-          return c.substring(name.length, c.length);
-        }
-      }
-      return "";
     },
 
     dragElement: function(elmnt){
@@ -227,7 +196,9 @@ export default {
           document.onmouseup = () => {
             document.onmouseup = null;
             document.onmousemove = null;
+
             this.saveRoomState();
+            this.selectFurniture(index);
           };
           // call a function whenever the cursor moves:
           document.onmousemove = e => {
@@ -241,6 +212,7 @@ export default {
             // set the element's new position:
             elmnt.style.top = (elmnt.offsetTop - position[1]) + "px";
             elmnt.style.left = (elmnt.offsetLeft - position[0]) + "px";
+
             this.room.furniture[index].position.top = elmnt.style.top;
             this.room.furniture[index].position.left = elmnt.style.left;
           };
@@ -256,7 +228,9 @@ export default {
           document.onmouseup = () => {
             document.onmouseup = null;
             document.onmousemove = null;
+
             this.saveRoomState();
+            this.selectFurniture(index);
           };
           // call a function whenever the cursor moves:
           document.onmousemove = e => {
@@ -270,68 +244,32 @@ export default {
             // set the element's new position:
             elmnt.style.top = (elmnt.offsetTop - position[1]) + "px";
             elmnt.style.left = (elmnt.offsetLeft - position[0]) + "px";
+
             this.room.furniture[index].position.top = elmnt.style.top;
             this.room.furniture[index].position.left = elmnt.style.left;
-            //console.log(this.piece.position.left + ", " + this.piece.position.top);
           };
         };
       }
     },
 
-    dragMouseDown: function(e){
-      e = e || window.event;
-      e.preventDefault();
-      // get the mouse cursor position at startup:
-      this.pos3 = e.clientX;
-      this.pos4 = e.clientY;
-      document.onmouseup = () => {
-        document.onmouseup = null;
-        document.onmousemove = null;
-        this.saveRoomState();
-      };
-      // call a function whenever the cursor moves:
-      document.onmousemove = e => {
-        e = e || window.event;
-        e.preventDefault();
-        // calculate the new cursor position:
-        position[0] = position[2] - e.clientX;
-        position[1] = position[3] - e.clientY;
-        position[2] = e.clientX;
-        position[3] = e.clientY;
-        // set the element's new position:
-        elmnt.style.top = (elmnt.offsetTop - position[1]) + "px";
-        elmnt.style.left = (elmnt.offsetLeft - position[0]) + "px";
-        this.room.furniture[index].position.top = elmnt.style.top;
-        this.room.furniture[index].left = elmnt.style.left;
-        //console.log(this.piece.position.left + ", " + this.piece.position.top);
-      };
+    selectFurniture: function(index){
+      //DESELECT FURNITURE
+      if (this.activeFurnitureIndex !== -1)
+        this.getHtmlElement(this.activeFurnitureIndex).style.fontWeight = "normal";
+
+      this.activeFurnitureIndex = index;
+
+      //SELECT FURNITURE
+      this.getHtmlElement(this.activeFurnitureIndex).style.fontWeight = "bold";
     },
 
-    elementDrag: function(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // calculate the new cursor position:
-      this.pos1 = this.pos3 - e.clientX;
-      this.pos2 = this.pos4 - e.clientY;
-      this.pos3 = e.clientX;
-      this.pos4 = e.clientY;
-      // set the element's new position:
-      this.elmnt.style.top = (this.elmnt.offsetTop - this.pos2) + "px";
-      this.elmnt.style.left = (this.elmnt.offsetLeft - this.pos1) + "px";
-      this.piece.position.top = this.elmnt.style.top;
-      this.piece.position.left = this.elmnt.style.left;
-      console.log(this.piece.position.left + ", " + this.piece.position.top);
-    },
 
-    closeDragElement: function() {
-      // stop moving when mouse button is released:
-      document.onmouseup = null;
-      document.onmousemove = null;
-      this.saveRoomState();
+    getHtmlElement: function(index){
+      return document.getElementById(`furniture-${index}`);
+    },
+    getHtmlHeader: function(index){
+      return document.getElementById(`furniture-${index}-header`);
     }
-
-
-
 
   },
   mounted: function() {
@@ -348,11 +286,6 @@ export default {
     });
 
     console.log("props: ", this.username);
-    // Make the DIV element draggable:
-    //document.getElementsByClassName("draggable").forEach(elmnt => dragElement(elmnt));
-
-
-
   },
 
   watched: {
@@ -432,5 +365,11 @@ export default {
   z-index: 10;
   background-color: #2196F3;
   color: #fff;
+}
+
+.selected {
+}
+
+.selected-h {
 }
 </style>
