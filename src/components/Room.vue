@@ -15,7 +15,7 @@
   <div class="item3">Decorate:
     <button @click="createFurniture">Add furniture</button>
     <button>Modify furniture</button>
-    <button>Delete furniture</button>
+    <button @click="deleteFurniture">Delete furniture</button>
   </div>
   <div class="item4">footer:</div>
 </div>
@@ -145,12 +145,24 @@ export default {
       currentRoom.furniture = tempList;
 
       this.room = currentRoom;
-      this.saveRoomState(this.renderFurniture(() => {
-        //Make all the elements draggable
+      this.saveRoomState(this.renderFurniture);
+    },
+
+    deleteFurniture: function(){
+      this.room.furniture.splice(this.activeFurnitureIndex, 1);
+      this.activeFurnitureIndex = -1;
+      this.saveRoomState(this.renderFurniture)
+
+      //this is copy-pasted from mounted run
+      this.populateRoom(() => {
+        console.log("calllbackkk");
         const elmnts = document.getElementsByClassName("draggable");
-      }));
-
-
+        console.log(elmnts.length);
+        for (let i = 0; i < elmnts.length; i++){
+          console.log(i);
+          this.dragElement(elmnts[i]);
+        }
+      });
     },
 
     saveRoomState: function(callback) {
@@ -162,6 +174,7 @@ export default {
     renderFurniture: function(callback) {
       //place to insert the furniture
       const furnitureContainer = document.getElementById("furniture-container");
+      furnitureContainer.innerHTML = "Room:";
         this.room.furniture.forEach((piece, index) => {
           const DOG_URL = "https://i.imgur.com/dQemleO.jpg?1";
           const pieceHTML = `<div id="furniture-${index}"class="draggable" style="position: absolute;
@@ -255,20 +268,12 @@ export default {
     selectFurniture: function(index){
       //DESELECT FURNITURE
       if (this.activeFurnitureIndex !== -1)
-        this.getHtmlElement(this.activeFurnitureIndex).style.fontWeight = "normal";
+        document.getElementById(`furniture-${this.activeFurnitureIndex}`).style.fontWeight = "initial";
 
       this.activeFurnitureIndex = index;
 
       //SELECT FURNITURE
-      this.getHtmlElement(this.activeFurnitureIndex).style.fontWeight = "bold";
-    },
-
-
-    getHtmlElement: function(index){
-      return document.getElementById(`furniture-${index}`);
-    },
-    getHtmlHeader: function(index){
-      return document.getElementById(`furniture-${index}-header`);
+      document.getElementById(`furniture-${this.activeFurnitureIndex}`).style.fontWeight = "bold";
     }
 
   },
