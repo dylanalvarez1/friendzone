@@ -24,12 +24,13 @@
   <div id="modifier" class="item3" style="display: none">Modify Furniture:
     <button @click="exitFurnitureModify">Back</button>
     <button @click="saveFurnitureModifications">Save changes</button><br><br>
-    <label>Name</label><input type="text"><br>
-    <label>URL</label><input type="url"><br>
-    <label>Color</label><input type="color"><br>
-    <label>Z-index</label><input type="number"><br><br>
-    <label>Width</label><input type="range">
-    <label>Height</label><input type="range">
+    <label>Title</label><input type="text" v-model="mod.new.title"><br>
+    <label>Link</label><input type="url" v-model="mod.new.url"><br>
+    <label>Image</label><input type="url" v-model="mod.new.iconUrl"><br>
+    <label>Color</label><input type="color" v-model="mod.new.color"><br>
+    <label>Z-index</label><input type="number" v-model="mod.new.z"><br><br>
+    <label>Width</label><input type="text" onchange="console.log(this)" v-model="mod.new.width">
+    <label>Height</label><input type="text" v-model="mod.new.height">
   </div>
 
 
@@ -46,6 +47,10 @@ export default {
   name: 'room',
   data() {
     return {
+      mod: {
+        new: {},
+        old: {}
+      },
       pos1: 0,
       pos2: 0,
       pos3: 0,
@@ -60,7 +65,19 @@ export default {
          "friends": []
        },*/
       params: undefined,
-      furniture: []
+      furniture: [],
+      DEFAULT_FURNITURE: {
+        title: "Welcome!",
+        iconUrl: "https://i.imgur.com/dQemleO.jpg?1",
+        url: "",
+        creator: "friendzone",
+        dateCreated: Date.now(),
+        position: {top: "0px", left: "0px"},
+        color: "#2196F3",
+        height: "90px",
+        width: "90px",
+        z: 0,
+      }
     }
   },
   props: ['username'],
@@ -91,7 +108,7 @@ export default {
       firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
         this.user = snapshot.val();
         //console.log(this.user);
-        console.log(this.user.following);
+        //console.log(this.user.following);
 
       }).then(() => {
         this.friends = []; //empty the array before filling it with user info
@@ -121,7 +138,7 @@ export default {
           console.log("snapshot.val()" + snapshot.val());
 
           //initialize room furniture if nonexistent
-          if (!this.room.furniture) this.initializeFurniture(callback);
+          if (!this.room.furniture && this.room.furniture !== []) this.initializeFurniture(callback);
           //else callback();
 
           this.furniture = this.room.furniture;
@@ -151,17 +168,9 @@ export default {
 
     createFurniture: function() {
       let currentRoom = this.room;
-      let defaultFurniture = {
-        title: "Welcome!",
-        iconUrl: "https://i.imgur.com/dQemleO.jpg?1",
-        url: "",
-        creator: "friendzone",
-        dateCreated: Date.now(),
-        position: {top: "0px", left: "0px"}
-      };
       let tempList = this.room.furniture;
       console.log(tempList);
-      tempList.push(defaultFurniture);
+      tempList.push(this.DEFAULT_FURNITURE);
       this.furniture = tempList;
       currentRoom.furniture = tempList;
 
@@ -178,7 +187,7 @@ export default {
       this.saveRoomState();
 
       //this is copy-pasted from mounted run
-      this.populateRoom();
+      this.renderFurniture();
     },
 
     saveRoomState: function(callback) {
@@ -193,22 +202,27 @@ export default {
       //place to insert the furniture
       const furnitureContainer = document.getElementById("furniture-container");
       furnitureContainer.innerHTML = "Room:";
+      if (!this.room.furniture.forEach) return;
         this.room.furniture.forEach((piece, index) => {
           const DOG_URL = "https://i.imgur.com/dQemleO.jpg?1";
           const pieceHTML = `<div id="furniture-${index}"class="draggable" style="position: absolute;
-          z-index: 9;
+          z-index: ${piece.z};
           background-color: #f1f1f1;
           border: 1px solid #d3d3d3;
           text-align: center;
           top: ${piece.position.top};
-          left: ${piece.position.left};"><div class="draggableheader" id="furniture-${index}-header" style="cursor: move; padding: 5px;">test</div><a href="${piece.url}"><img src="${DOG_URL}" class="testImage" style="padding: 5px;
+          left: ${piece.position.left};"><div class="draggableheader" id="furniture-${index}-header" style="cursor: move; padding: 5px; z-index: ${piece.z};">${piece.title}</div><a href="${piece.url}"><img src="${piece.iconUrl}" class="testImage" style="padding: 5px;
           padding: 25px;
-          z-index: 10;
-          background-color: #2196F3;
+          background-color: ${piece.color};
           color: #fff;
-          width: 100px; height: 100px;"></a></div>`;
+          width: ${piece.width}; height: ${piece.height};"></a></div>`;
           furnitureContainer.innerHTML += pieceHTML;
         });
+
+        //this code persists the selected Index across renderings
+        const temp = this.activeFurnitureIndex;
+        this.activeFurnitureIndex = -1;
+        this.selectFurniture(temp);
         this.makeAllDraggable(callback);
     },
 
@@ -301,10 +315,15 @@ export default {
       if (this.activeFurnitureIndex === -1) return;
       document.getElementById("decorator").style.display = "none";
       document.getElementById("modifier").style.display = "block";
+      //stash old furniture data (deep clone)
+      this.mod.old = JSON.parse(JSON.stringify(this.room.furniture[this.activeFurnitureIndex]));
+      this.mod.new = this.room.furniture[this.activeFurnitureIndex];
     },
 
     saveFurnitureModifications: function(){
-
+      this.mod.old = this.mod.new;
+      this.room.furniture[this.activeFurnitureIndex] = this.mod.old;
+      this.saveRoomState(this.renderFurniture);
     },
 
     exitFurnitureModify: function(){
