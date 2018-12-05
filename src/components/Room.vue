@@ -2,7 +2,8 @@
 <div class="grid-container">
   <div class="item1">header:
     <div>
-      {{activeFurnitureIndex}}
+      {{room.title}}
+      (debug) furniture index {{activeFurnitureIndex}}
     </div>
   </div>
   <div id="furniture-container" class="item2">Room:
@@ -16,21 +17,35 @@
   <!--Toolbar-->
   <div id="decorator" class="item3">Decorate:
     <button @click="createFurniture">Add furniture</button>
-    <button @click="enterFurnitureModify">Modify furniture</button>
-    <button @click="deleteFurniture">Delete furniture</button>
+    <!--button @click="enterRoomModify">Modify room</button-->
   </div>
 
   <!--Modify Events-->
-  <div id="modifier" class="item3" style="display: none">Modify Furniture:
-    <button @click="exitFurnitureModify">Back</button>
-    <button @click="saveFurnitureModifications">Save changes</button><br><br>
-    <label>Title</label><input type="text" v-model="mod.new.title"><br>
-    <label>Link</label><input type="url" v-model="mod.new.url"><br>
-    <label>Image</label><input type="url" v-model="mod.new.iconUrl"><br>
-    <label>Color</label><input type="color" v-model="mod.new.color"><br>
-    <label>Z-index</label><input type="number" v-model="mod.new.z"><br><br>
-    <label>Width</label><input type="text" onchange="console.log(this)" v-model="mod.new.width">
-    <label>Height</label><input type="text" v-model="mod.new.height">
+  <div id="f-modifier" class="item3" style="display: none">Modify Furniture:
+    <form @submit="saveFurnitureModifications">
+      <button type="submit" @click="saveFurnitureModifications">Save changes</button>
+      <button @click="exitFurnitureModify" style="width: 50%">Back</button><br><br>
+      <label>Title</label><input type="text" v-model="mod.new.title"><br>
+      <label>Link</label><input type="url" v-model="mod.new.url"><br>
+      <label>Image</label><input type="url" v-model="mod.new.iconUrl"><br>
+      <label>Color</label><input type="color" v-model="mod.new.color"><br>
+      <label>Z-index</label><input type="number" min="0" max="100" v-model="mod.new.z"><br><br>
+      <label>Width</label><input type="text" onchange="console.log(this)" v-model="mod.new.width">
+      <label>Height</label><input type="text" v-model="mod.new.height"><br><br>
+      <button @click="deleteFurniture" style="background-color: red; color: ; font-weight: bold;">Delete furniture</button><br><br>
+    </form>
+  </div>
+
+  <div id="r-modifier" class="item3" style="display: none">Modify Room:
+    <form>
+      <button @click="saveRoomModifications">Save changes</button>
+      <button @click="exitRoomModify">Back</button><br><br>
+      <label>Title</label><input type="text" v-model="modr.new.title"><br><br>
+      <label>Background Color</label><input type="color" v-model="modr.new.color"><br><br>
+      <label>Wallpaper URL</label><input type="url" v-model="modr.new.wallpaper">
+
+
+    </form>
   </div>
 
 
@@ -47,6 +62,11 @@ export default {
   name: 'room',
   data() {
     return {
+      modr: {
+        new: {},
+        old: {}
+
+      },
       mod: {
         new: {},
         old: {}
@@ -138,7 +158,7 @@ export default {
           console.log("snapshot.val()" + snapshot.val());
 
           //initialize room furniture if nonexistent
-          if (!this.room.furniture && this.room.furniture !== []) this.initializeFurniture(callback);
+          if (!this.room.furniture && this.room.furniture !== []) this.initializeFurniture();
           //else callback();
 
           this.furniture = this.room.furniture;
@@ -153,26 +173,18 @@ export default {
     },
 
     initializeFurniture: function(callback) {
-      this.room.furniture = [
-        {
-          title: "Welcome!",
-          iconUrl: "https://i.imgur.com/dQemleO.jpg?1",
-          url: "",
-          creator: "friendzone",
-          dateCreated: Date.now(),
-          position: {top: "0px", left: "0px"}
-        }
-      ];
-      this.saveRoomState(callback);
+      this.room.furniture = [];
     },
 
     createFurniture: function() {
       let currentRoom = this.room;
       let tempList = this.room.furniture;
       console.log(tempList);
-      tempList.push(this.DEFAULT_FURNITURE);
+      if (!tempList.push) tempList = [];
+      tempList.push(JSON.parse(JSON.stringify(this.DEFAULT_FURNITURE)));
       this.furniture = tempList;
       currentRoom.furniture = tempList;
+      this.activeFurnitureIndex = currentRoom.furniture.length - 1;
 
       this.room = currentRoom;
       this.saveRoomState();
@@ -183,16 +195,13 @@ export default {
 
     deleteFurniture: function(){
       this.room.furniture.splice(this.activeFurnitureIndex, 1);
-      this.activeFurnitureIndex = -1;
+      this.exitFurnitureModify();
       this.saveRoomState();
-
-      //this is copy-pasted from mounted run
       this.renderFurniture();
     },
 
     saveRoomState: function(callback) {
       firebase.database().ref(`/rooms/${GROUP_ID}`).set(this.room);
-      //console.log("saving " + JSON.stringify(this.room));
       if (callback) callback();
     },
 
@@ -211,7 +220,7 @@ export default {
           border: 1px solid #d3d3d3;
           text-align: center;
           top: ${piece.position.top};
-          left: ${piece.position.left};"><div class="draggableheader" id="furniture-${index}-header" style="cursor: move; padding: 5px; z-index: ${piece.z};">${piece.title}</div><a href="${piece.url}"><img src="${piece.iconUrl}" class="testImage" style="padding: 5px;
+          left: ${piece.position.left};"><div class="draggableheader" id="furniture-${index}-header" style="cursor: move; padding: 5px; z-index: ${piece.z};">${piece.title}</div><a id="furniture-${index}-a" href="${piece.url}"><img id="furniture-${index}-img" src="${piece.iconUrl}" class="testImage" style="padding: 5px;
           padding: 25px;
           background-color: ${piece.color};
           color: #fff;
@@ -224,6 +233,22 @@ export default {
         this.activeFurnitureIndex = -1;
         this.selectFurniture(temp);
         this.makeAllDraggable(callback);
+    },
+    //unused
+    renderPiece: function(callback){
+      const piece = this.mod.new;
+      const index = this.activeFurnitureIndex;
+      const elem = document.getElementById(`furniture-${index}`);
+      const elemHeader = document.getElementById(`furniture-${index}-header`);
+      elem.style.zIndex = piece.z;
+      elem.style.top = piece.position.top;
+      elem.style.left = piece.position.left;
+      elem.style.backgroundColor = piece.color;
+      elemHeader.style.zIndex = piece.z;
+      elemHeader.innerText = piece.title;
+      document.getElementById(`furniture-${index}-a`).href = piece.url;
+      document.getElementById(`furniture-${index}-img`).src = piece.iconUrl;
+      if (callback) callback();
     },
 
     dragElement: function(elmnt){
@@ -303,9 +328,8 @@ export default {
       if (this.activeFurnitureIndex !== -1)
         document.getElementById(`furniture-${this.activeFurnitureIndex}`).style.fontWeight = "initial";
 
-      this.exitFurnitureModify();
-
       this.activeFurnitureIndex = index;
+      this.enterFurnitureModify();
 
       //SELECT FURNITURE
       document.getElementById(`furniture-${this.activeFurnitureIndex}`).style.fontWeight = "bold";
@@ -314,7 +338,7 @@ export default {
     enterFurnitureModify: function(){
       if (this.activeFurnitureIndex === -1) return;
       document.getElementById("decorator").style.display = "none";
-      document.getElementById("modifier").style.display = "block";
+      document.getElementById("f-modifier").style.display = "block";
       //stash old furniture data (deep clone)
       this.mod.old = JSON.parse(JSON.stringify(this.room.furniture[this.activeFurnitureIndex]));
       this.mod.new = this.room.furniture[this.activeFurnitureIndex];
@@ -327,8 +351,34 @@ export default {
     },
 
     exitFurnitureModify: function(){
-      document.getElementById("modifier").style.display = "none";
+      //deselect
+      document.getElementById(`furniture-${this.activeFurnitureIndex}`).style.fontWeight = "initial";
+      this.activeFurnitureIndex = -1;
+      document.getElementById("f-modifier").style.display = "none";
       document.getElementById("decorator").style.display = "block";
+    },
+
+    enterRoomModify: function(){
+      document.getElementById("decorator").style.display = "none";
+      document.getElementById("r-modifier").style.display = "block";
+      //stash current settings
+      this.modr.old.title = this.room.title;
+      this.modr.old.color= this.room.color;
+      this.modr.old.wallpaperUrl = this.room.wallpaperUrl;
+    },
+
+    saveRoomModifications: function(){
+      this.modr.old = this.modr.new;
+    },
+
+    exitRoomModify: function(){
+      this.room.title = this.modr.old.title;
+      this.room.color = this.modr.old.color;
+      this.room.wallpaperUrl = this.modr.old.wallpaperUrl;
+      this.saveRoomState(() => {
+        document.getElementById("r-modifier").style.display = "none";
+        document.getElementById("decorator").style.display= "block";
+      });
     },
 
     makeAllDraggable: function(callback){
@@ -378,7 +428,7 @@ export default {
     'footer footer footer footer footer footer';
 
   grid-template-rows: 100px 200px 200px 50px;
-  grid-template-columns: 50px 1fr 1fr 1fr 50px 100px;
+  grid-template-columns: 50px 1fr 1fr 1fr 50px 125px;
 
 }
 
@@ -432,12 +482,20 @@ export default {
 .selected-h {
 }
 
-#modifier *{
+#f-modifier *{
   font-size: 11px;
   width: 90%;
 }
 
-#modifier button{
+#f-modifier button{
+  width: 100%;
+}
+#r-modifier *{
+  font-size: 11px;
+  width: 90%;
+}
+
+#r-modifier button{
   width: 100%;
 }
 </style>
