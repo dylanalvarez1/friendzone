@@ -1,10 +1,10 @@
 <template>
   <div class="groupProfile">
     <div class="grid-container">
-      <div class="grid-item item1">
-        <div @click="joinGroup(group.groupID)">
+      <div class="grid-item item1" @click="joinGroup(group.groupID)">
+        <div >
           <img src="../assets/logo.png" style="width: 50px; height: 50px"/>
-          <p>Join group</p>
+          <p>{{group_status}}</p>
         </div>
       </div>
       <div class="grid-item item4">
@@ -21,7 +21,7 @@
       </div>
       <div class="grid-item item2">
         <div v-if="group">
-          <h2>{{this.group.groupID}}</h2>
+          <h2>{{this.group.title}}</h2>
           <img :src="group.iconURL" alt="No group icon" style="max-height:300px; max-width:300px;"/><br>
           <p>{{this.group.description}}</p>
         </div>
@@ -62,17 +62,61 @@ export default {
       admins: undefined,
       group: undefined,
       params: "",
+      group_status:"join group"
     }
   },
   components: {
       Icon,
     },
   methods: {
-    joinGroup: function(groupName) {
-      alert('Joined '+groupName);
+    joinGroup: function(groupID) {
+      // alert('Joined '+groupName);
+      let group_member_ref=firebase.database().ref().child(`groups/${groupID}/members`);
+      let current_user_ref=firebase.database().ref().child(`users/${firebase.auth().currentUser.uid}/groups`);
+
+      let current_group_member_data=[];
+      let user_uid=firebase.auth().currentUser.uid;
+      group_member_ref.once('value').then(function(snapshot) {
+
+        snapshot.forEach(function (child) {
+          current_group_member_data.push(child.val());
+        });
+        if(current_group_member_data.includes(user_uid)){
+          current_group_member_data.splice(current_group_member_data.indexOf(user_uid),1);
+
+
+
+        }else {
+          current_group_member_data.push(user_uid);
+        }
+        group_member_ref.set(current_group_member_data);
+      });
+      let current_user_group_data=[];
+
+      current_user_ref.once('value').then((snapshot)=>{
+        snapshot.forEach(function (child) {
+          current_user_group_data.push(child.val());
+        });
+        if(current_user_group_data.includes(groupID)){
+          current_user_group_data.splice(current_user_group_data.indexOf(groupID),1);
+        }else {
+          current_user_group_data.push(groupID);
+        }
+        current_user_ref.set(current_user_group_data);
+      });
+
+      if(this.group_status==="join group"){
+        this.group_status="leave group";
+      }else if(this.group_status==="leave group"){
+        this.group_status="join group";
+      }
+      this.getGroupById(groupID);
+
     },
-    goToRoom: function(name) {
-      alert("Now entering " + name + "'s room");
+    goToRoom: function(groupID) {
+      // alert("Now entering " + name + "'s room");
+      this.$router.push({ path: `/room/${groupID}` });
+
     },
     goToFollowedPage: function(name) {
       this.$router.push({ path: `/home/${name}` });
@@ -113,23 +157,23 @@ export default {
         //console.log(snapshot.val());
         let temp= snapshot.val();
         //console.log("temp", temp);
-        let storage = firebase.storage();
+        // let storage = firebase.storage();
 
         // Create a storage reference from our storage service
-        let storageRef = storage.ref();
+        // let storageRef = storage.ref();
 
         // Create a child reference
-        var imagesRef = storageRef.child('images');
+        // var imagesRef = storageRef.child('images');
         // imagesRef now points to 'images'
         //console.log("part 2");
         //console.log(temp.iconURL);
         // Child references can also take paths delimited by '/'
-        var spaceRef = storageRef.child(temp.iconURL);
+        var spaceRef = firebase.storage().ref().child(temp.iconURL);
         // spaceRef now points to "images/space.jpg"
         // imagesRef still points to "images"
 
         spaceRef.getDownloadURL().then((url) => {
-            let test = url;
+            // let test = url;
             //console.log("url", url);
             temp.iconURL = url;
             //console.log("temp", temp);
@@ -163,12 +207,32 @@ export default {
 
 
 
+    },
+
+    alterGroupStatus: function(){
+      let group_member_ref=firebase.database().ref().child(`groups/${this.params}/members`);
+      let current_group_member_data=[];
+      let user_uid=firebase.auth().currentUser.uid;
+      group_member_ref.once('value').then(snapshot=> {
+
+        snapshot.forEach(function (child) {
+          current_group_member_data.push(child.val());
+        });
+        if(current_group_member_data.includes(user_uid)){
+          this.group_status=("leave group");
+        }else {
+          this.group_status=("join group");
+        }
+        group_member_ref.set(current_group_member_data);
+      });
+
     }
 
   },
 
  mounted: function() {
     this.getGroup();
+    this.alterGroupStatus();
   },
 
   watch: {
@@ -176,6 +240,7 @@ export default {
       //console.log("In watched for param: ", id);
       this.params = id;
       this.getGroup();
+      this.alterGroupStatus();
 
     }
   },

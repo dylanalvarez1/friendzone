@@ -22,24 +22,24 @@ import firebase from 'firebase'
     methods: {
       logout: function() {
         firebase.auth().signOut().then(()=> {
-          this.$router.push({ path: `/login/` });
+          this.$router.push({ path: `/login` });
         });
       },
       toProfile: function() {
         console.log("To home!");
-        let space = " ";
+        let space = firebase.auth().currentUser.uid;
         this.$router.push({ path: `/home/${space}` });
       },
       toRoom: function() {
-        console.log("To home!");
-        this.$router.push({ path: `/room/test@memecom` });
+        console.log("To room!");
+        this.$router.push({ path: `/room/${firebase.auth().currentUser.uid}` });
       },
       toExplore: function() {
         console.log("To explore!");
-        this.$router.push({ path: `/explore/` });
+        this.$router.push({ path: `/explore` });
       },
       toGroup: function() {
-        this.$router.push({ path: `/group/` });
+        this.$router.push({ path: `/group` });
       }
 
     },

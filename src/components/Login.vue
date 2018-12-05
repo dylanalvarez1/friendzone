@@ -60,7 +60,7 @@
       signIn: function () {
         firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
           (user) => {
-            this.$router.push({ path: `/home/` });
+            this.$router.push({ path: `/home/${firebase.auth().currentUser.uid}` });
           },
           (err) => {
             alert('Oops. ' + err.message);

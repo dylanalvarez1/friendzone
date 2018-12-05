@@ -93,10 +93,11 @@ export default {
   },
   props: ['username'],
   methods: {
-    getUser: function() {
+    getUser: function () {
       //Gets the correct user by checking if there is a router param and then calls getUserById (firebase call)
 
       //console.log("route params:", this.$route.params.username);
+
 
 
       if (this.params != undefined && this.params != " ") {
@@ -412,6 +413,7 @@ export default {
 }
 
   </script>
+
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>

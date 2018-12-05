@@ -1,10 +1,20 @@
 <template>
 <div>
   <div class="grid-container">
-    <div class="grid-item item1">
-      <div @click="followUser(user.displayName)">
+    <div @click="followUser(user.displayName)" v-if="!(current_user.uid===null||current_user.uid===params)" class="grid-item item1">
+      <div >
         <img src="../assets/logo.png" style="width: 50px; height: 50px"/>
-        <p>Follow</p>
+        <!--<p >follow</p>-->
+
+        <p>{{follow_status}}</p>
+      </div>
+    </div>
+    <div @click="customizeUser(user.uid)" v-else class="grid-item item1">
+      <div >
+        <img src="../assets/logo.png" style="width: 50px; height: 50px"/>
+        <!--<p >follow</p>-->
+
+        <p>Customization</p>
       </div>
     </div>
     <div class="grid-item item4">
@@ -13,10 +23,11 @@
         <p>Go to room</p>
       </div>
     </div>
-    <div v-if="user" class="grid-item item2">
+
+    <div  class="grid-item item2">
       <h2 v-if="user.displayName">{{this.user.displayName}}</h2>
       <p v-if="user.email">{{this.user.email}}</p>
-      <img v-if="user.photoURL" :src="user.photoURL" alt="no profile image" style="max-height:300px; max-width:300px;" /><br>
+      <img v-if="user.photoURL" :src="user.photoURL" alt="no profile image" style="max-height:300px; max-width:300px;" ><br>
     </div>
     <div class="grid-item item3">
       <div><p id="friendLabel">Following:</p>
@@ -37,33 +48,40 @@
 </template>
 
 <script>
-import firebase from 'firebase'
-import Icon from '@/components/Icon'
+  import firebase from 'firebase'
+
+  import Icon from '@/components/Icon'
   export default {
     name: 'login',
     data: function() {
       return {
+
        user : {
          "photoURL": "",
          "displayName": "",
          "email": "",
          "friends": [],
          "groups": [],
+         "uid" : ""
        },
        friends: [],
        groups: [],
        params: undefined,
-
+       current_user: "",
+        follow_status: "follow",
+        // following_status:"follow"
       }
+
     },
     props: ['username'],
     components: {
       Icon,
     },
     methods: {
-      goToUserPage: function(name) {
-        alert("Go to " + name + "'s room?");
+      customizeUser: function(userID){
+        this.$router.push({ path: `/user-customization/` });
       },
+
       goToFollowedPage: function(name) {
         //console.log("name", name);
         this.$router.push({ path: `/home/${name}` });
@@ -72,23 +90,56 @@ import Icon from '@/components/Icon'
         this.$router.push({ path: `/group/${name}` });
       },
       followUser: function(name) {
-        alert("Follow " + name + "?");
+        // alert("Follow " + name + "?");
+        let following_ref=firebase.database().ref().child(`users/${this.current_user.uid}/following`);
+        let current_user_following_data=[];
+        let new_follow_data=this.params;
+        following_ref.once('value').then(function(snapshot) {
+
+          snapshot.forEach(function (child) {
+            current_user_following_data.push(child.val());
+          });
+          if(current_user_following_data.includes(new_follow_data)){
+            current_user_following_data.splice(current_user_following_data.indexOf(new_follow_data),1);
+          }else {
+            current_user_following_data.push(new_follow_data);
+          }
+          following_ref.set(current_user_following_data);
+        });
+        if(this.follow_status==="follow"){
+          this.follow_status="unfollow";
+        }else if(this.follow_status==="unfollow"){
+          this.follow_status="follow";
+        }
+
       },
       goToRoom: function(name) {
-        alert("Now entering " + name + "'s room");
-      },
+        // alert("Now entering " + name + "'s room");
+        this.$router.push({ path: `/room/${firebase.auth().currentUser.uid}` });
 
+      },
+      updateCurrentUser: function(snapshot){
+        this.current_user=snapshot.val();
+
+      },
       getUser: function() {
         //Gets the correct user by checking if there is a router param and then calls getUserById (firebase call)
 
-        //console.log("route params:", this.$route.params.username);
-        this.params = this.$route.params.username;
 
+        this.params = this.$route.params.userID;
+        firebase.database().ref('/users/' + firebase.auth().currentUser.uid).once('value').then((snapshot)=> {
+          console.log(snapshot.val());
+          // this.current_user=snapshot.val();
+          this.updateCurrentUser(snapshot);
+          console.log(this.current_user);
 
-        if(this.params != undefined && this.params != " ") {
+        })
+        // this.current_user=firebase.auth().currentUser;
+
+        if(this.params !== undefined && this.params !== " ") {
           //This is when you visit another profile, there is a path param in the route
           //console.log("In getUser call with route params");
-          const userId = this.params.replace(".","");
+          const userId = this.params;
           //console.log("userId", userId);
           this.getUserById(userId);
         }
@@ -102,28 +153,35 @@ import Icon from '@/components/Icon'
         }
 
       },
-
+      updateProfileUser: function(snapshot){
+        this.user=snapshot.val();
+      },
       getUserById: function (userId) {
+
         firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
-            this.user = snapshot.val();
-            //console.log(this.user);
+          this.updateProfileUser(snapshot);
+            console.log(snapshot.val());
+            console.log(this.user);
             //console.log(this.user.following);
 
           }).then(() => {
               this.friends = []; //empty the array before filling it with user info
               this.groups = [];
-              this.user.following.forEach(friend => {
-                let tempId = friend.replace(".","");
-                firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
-                this.friends.push(snapshot.val());
+              if(this.user.hasOwnProperty('following')) {
+                this.user.following.forEach(friend => {
+                  let tempId = friend.replace(".", "");
+                  firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
+                    this.friends.push(snapshot.val());
+
+                  });
 
                 });
-
-              });
+              }
+             if(this.user.hasOwnProperty('groups')) {
 
               this.user.groups.forEach(group => {
                 //console.log("for each group:")
-                let tempId = group.replace(".","");
+                let tempId = group.replace(".", "");
                 firebase.database().ref('/groups/' + tempId).once('value').then((snapshot) => {
                   let temp = snapshot.val();
                   //console.log("Group: ", temp);
@@ -143,57 +201,79 @@ import Icon from '@/components/Icon'
                   // imagesRef still points to "images"
 
                   spaceRef.getDownloadURL().then((url) => {
-                      let test = url;
-                      //console.log("url", url);
-                      temp.iconURL = url;
-                      //console.log("temp", temp);
-                      this.groups.push(temp);
+                    let test = url;
+                    //console.log("url", url);
+                    temp.iconURL = url;
+                    //console.log("temp", temp);
+                    this.groups.push(temp);
 
-                  }).catch(function(error) {
+                  }).catch(function (error) {
 
                   });
 
 
-
-
                 });
 
+
               });
+             }
           });
-      }
+      },
+      check_follow: function(){
+        let following_ref=firebase.database().ref().child(`users/${this.current_user.uid}/following`);
+        let current_user_following_data=[];
+        let new_follow_data=this.params;
+
+        following_ref.once('value').then((snapshot)=> {
+          console.log(snapshot);
+          for(let key in snapshot.val()){
+            current_user_following_data.push(snapshot.val()[key]);
+          }
+          if(current_user_following_data.includes(new_follow_data)){
+            this.follow_status='unfollow';
+
+            // changeFollowText('unfollow');
+          }else {
+            this.follow_status='follow';
+          }
+        });
+
+      },
+
 
     },
     mounted: function() {
 
       this.getUser();
+      this.check_follow();
+
     },
     watch: {
-      '$route.params.username': function (username) {
+      '$route.params.userID': function (userID) {
         //console.log("In watched for param: ", username);
-        if(this.params === " ") {
-          //There is no router param so set it equal to who is signed in
-        }
-        this.params = username;
+        // if(this.params === " ") {
+        //   //There is no router param so set it equal to who is signed in
+        // }
+        this.params = userID;
         this.getUser();
+        this.check_follow();
 
       }
     },
     beforeRouteUpdate (to, from, next) {
       if(to.params) {
-        if(to.params.username === " ") {
-          //If the route param is empty
-          //console.log("Param is a space!")
-          this.params = " ";
-          next();
-        }
-        else {
-          const userId = to.params.username.replace(".","");
+        // if(to.params.userID === " ") {
+        //   //If the route param is empty
+        //   //console.log("Param is a space!")
+        //   this.params = " ";
+        //   next();
+        // }
+        // else {
+          const userId = to.params.userID;
           //console.log("BeforeRouteUpdate:", to.params.username);
           this.params = userId;
            next();
-        }
-
-
+        // }
       }
     },
   }

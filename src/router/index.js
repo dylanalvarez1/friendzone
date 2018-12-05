@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Explore from '@/components/Explore'
 import GroupRegistration from '@/components/GroupRegistration'
+import UserCustomization from '@/components/UserCustomization'
 import HelloWorld from '@/components/HelloWorld'
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
@@ -19,14 +20,14 @@ let router = new Router({
   routes: [
     {
       path: '*',
-      redirect: '/login'
+      redirect: '/home/:userID?'
     },
     {
       path: '/',
-      redirect: '/login'
+      redirect: '/home/:userID?'
     },
     {
-      path: '/home/:username?',
+      path: '/home/:userID?',
       name: 'Home',
       component: UserProfile,
       meta: {
@@ -53,6 +54,14 @@ let router = new Router({
       }
     },
     {
+      path: '/user-customization',
+      name: 'User Customization',
+      component: UserCustomization,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
       path: '/explore',
       name: 'Explore',
       component: Explore,
@@ -69,7 +78,7 @@ let router = new Router({
       }
     },
     {
-      path: '/room/:username?',
+      path: '/room/:ownerID',
       name: 'room',
       component: RoomComponent,
       meta: {
@@ -86,9 +95,22 @@ router.beforeEach((to, from, next) => {
 
   //we use .some() in case there are nested routes
 
-  if(requiresAuth && !currentUser) next('login');
-   else if(!requiresAuth&&currentUser) next('home');
-  else next();
+  if(!currentUser && (to.path === '/login'||to.path==='/sign-up' )){
+    next();
+  }else if(!currentUser && requiresAuth){
+    next(`/login`);
+  }else if(currentUser && to.path==='/home'){
+    next(`/home/${currentUser.uid}`);
+  }
+  //  else if(requiresAuth&&currentUser) {
+  //   // next(`/home/${currentUser.uid}`);
+  //   next();
+  // }
+  else {
+    next();
+      // next(`/home/${currentUser.uid}`);
+
+  }
 })
 
 export default router;

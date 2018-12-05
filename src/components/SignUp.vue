@@ -66,8 +66,8 @@
         firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
           (user) => {
             console.log("User id: " + this.email);
-            const user_uid=user.user.uid;
-            const room_uid=uuidv4();
+            // const user_uid=user.user.uid;
+            // const room_uid=uuidv4();
 
             // let iconRef = firebase.storage().ref().child('userIcons').child(user_uid).child(this.selectedFile.name);
             let photoURL="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg";
@@ -79,26 +79,40 @@
             //   }
             //   )
             // }
+            let user_ref=firebase.database().ref(`users/${firebase.auth().currentUser.uid}`);
+            let user_key=user_ref.key;
+            let room_ref=firebase.database().ref(`rooms/${user_key}`);
+            user_ref.set({
+              uid:user_key,
+              displayName: this.username,
+              email: this.email,
+              photoURL: photoURL,
+              admin: false,
+            });
+            room_ref.set({
+              uid:user_key,
+              displayName: this.username + "'s room",
+              group: false
+            });
 
-
-              firebase.database().ref('rooms/' + room_uid).set({
-                uid: room_uid,
-                title: this.username + "'s room",
-                owner: user_uid,
-                group: false,
-                // furniture:
-              });
-              firebase.database().ref('users/' + user_uid).set({
-                uid: user_uid,
-                displayName: this.username,
-                email: this.email,
-                photoURL: photoURL,
-                admin: false,
-                // followers: [],
-                // groups: [],
-                roomId: room_uid
-              });
-            this.$router.push({ path: `/home/` });
+            // firebase.database().ref('rooms/' + room_uid).set({
+            //     uid: room_uid,
+            //     title: this.username + "'s room",
+            //     owner: user_uid,
+            //     group: false,
+            //     // furniture:
+            //   });
+            //   firebase.database().ref('users/' + user_uid).set({
+            //     uid: user_uid,
+            //     displayName: this.username,
+            //     email: this.email,
+            //     photoURL: photoURL,
+            //     admin: false,
+            //     // followers: [],
+            //     // groups: [],
+            //     roomId: room_uid
+            //   });
+            this.$router.push({ path: `/home/${firebase.auth().currentUser.uid}` });
 
 
               // this.$emit("log_in");
@@ -112,11 +126,7 @@
     }
   }
 
-  function uuidv4() {
-    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    )
-  }
+
 </script>
 
 <style scoped>
