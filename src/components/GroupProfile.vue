@@ -113,8 +113,10 @@ export default {
       this.getGroupById(groupID);
 
     },
-    goToRoom: function(name) {
-      alert("Now entering " + name + "'s room");
+    goToRoom: function(groupID) {
+      // alert("Now entering " + name + "'s room");
+      this.$router.push({ path: `/room/${groupID}` });
+
     },
     goToFollowedPage: function(name) {
       this.$router.push({ path: `/home/${name}` });
