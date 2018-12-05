@@ -115,7 +115,7 @@
       },
       goToRoom: function(name) {
         // alert("Now entering " + name + "'s room");
-        this.$router.push({ path: `/room/${firebase.auth().currentUser.uid}` });
+        this.$router.push({ path: `/room/${this.params}` });
 
       },
       updateCurrentUser: function(snapshot){

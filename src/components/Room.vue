@@ -96,14 +96,14 @@ export default {
     getUser: function () {
       //Gets the correct user by checking if there is a router param and then calls getUserById (firebase call)
 
-      //console.log("route params:", this.$route.params.username);
-
+      console.log("route params:", this.$route.params.ownerID);
+      this.params=this.$route.params.ownerID;
 
 
       if (this.params != undefined && this.params != " ") {
         //This is when you visit another profile, there is a path param in the route
         console.log("In getUser call with route params");
-        const userId = this.params.replace(".", "");
+        const userId = this.params;
         console.log("userId", userId);
         this.getUserById(userId);
       } else {
@@ -119,7 +119,8 @@ export default {
     getUserById: function(userId) {
       firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
         this.user = snapshot.val();
-        //console.log(this.user);
+        console.log(snapshot.val());
+        console.log(this.user);
         //console.log(this.user.following);
 
       }).then(() => {
@@ -140,13 +141,19 @@ export default {
     //umbrella function
     //gets the data for the room ready
     populateRoom: function(callback) {
+       this.userId=this.$route.params.ownerID;
+      // this.userId=GROUP_ID;
       firebase.database()
-        .ref(`/rooms/${GROUP_ID}`)
+        .ref(`/rooms/${this.userId}`)
         .once('value')
         .then(snapshot => {
           //set the room
           this.room = snapshot.val();
-          this.verifyFurnitureIsArray(this.room.furniture);
+          console.log(snapshot.val());
+          console.log(this.room);
+          if(this.room.hasOwnProperty('furniture')) {
+            this.verifyFurnitureIsArray(this.room.furniture);
+          }
           this.furniture = this.room.furniture || [];
           console.log("snapshot.val()" + snapshot.val());
 
@@ -177,7 +184,11 @@ export default {
 
     createFurniture: function() {
       let currentRoom = this.room;
-      let tempList = this.room.furniture;
+      let tempList=[];
+      if(this.room.hasOwnProperty('furniture')) {
+        tempList = this.room.furniture;
+      }
+
       console.log(tempList);
       if (!tempList.push) tempList = [];
       tempList.push(JSON.parse(JSON.stringify(this.DEFAULT_FURNITURE)));
@@ -200,7 +211,7 @@ export default {
     },
 
     saveRoomState: function(callback) {
-      firebase.database().ref(`/rooms/${GROUP_ID}`).set(this.room);
+      firebase.database().ref(`/rooms/${this.userId}`).set(this.room);
       if (callback) callback();
     },
 
@@ -393,7 +404,7 @@ export default {
   },
   mounted: function() {
 
-    //this.getUser();
+    // this.getUser();
     this.populateRoom();
 
     console.log("props: ", this.username);
