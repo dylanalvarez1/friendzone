@@ -13,16 +13,16 @@
 
   <!--Modify Events-->
   <div id="f-modifier" class="item3" style="display: none">Modify Furniture:
-    <form @submit="saveFurnitureModifications">
-      <button type="submit" @click="saveFurnitureModifications">Save changes</button>
+    <form>
       <button @click="exitFurnitureModify" style="width: 50%">Back</button><br><br>
-      <label>Title</label><input type="text" v-model="mod.new.title"><br>
-      <label>Link</label><input type="url" v-model="mod.new.url"><br>
-      <label>Image</label><input type="url" v-model="mod.new.iconUrl"><br>
-      <label>Color</label><input type="color" v-model="mod.new.color"><br>
-      <label>Z-index</label><input type="number" min="0" max="100" v-model="mod.new.z"><br><br>
-      <label>Width</label><input type="text" onchange="console.log(this)" v-model="mod.new.width">
-      <label>Height</label><input type="text" v-model="mod.new.height"><br><br>
+      <label>Title</label><input type="text" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.title"><br>
+      <label>Link</label><input type="url" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.url"><br>
+      <label>Image</label><input type="url" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.iconUrl"><br>
+      <label>Color</label><input type="color" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.color"><br>
+      <label>Z-index</label><input type="number" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" min="0" max="100" v-model="mod.new.z"><br><br>
+      <label>Padding</label><input type="number" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" min="0" max="100" v-model="mod.new.padding"><br><br>
+      <label>Width</label><input type="text" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.width">
+      <label>Height</label><input type="text" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.height"><br><br>
       <button @click="deleteFurniture" style="background-color: red; color: ; font-weight: bold;">Delete furniture</button><br><br>
     </form>
   </div>
@@ -79,7 +79,7 @@ export default {
       furniture: [],
       DEFAULT_FURNITURE: {
         title: "Welcome!",
-        iconUrl: "https://i.imgur.com/dQemleO.jpg?1",
+        iconUrl: "https://upload.wikimedia.org/wikipedia/commons/d/d5/Japan_small_icon.png",
         url: "",
         creator: "friendzone",
         dateCreated: Date.now(),
@@ -212,18 +212,20 @@ export default {
       furnitureContainer.innerHTML = "";
       //if (!this.room.furniture.forEach) return;
         this.room.furniture.forEach((piece, index) => {
-          const DOG_URL = "https://i.imgur.com/dQemleO.jpg?1";
+          const DOG_URL = "https://upload.wikimedia.org/wikipedia/commons/d/d5/Japan_small_icon.png";
           const pieceHTML = `<div id="furniture-${index}"class="draggable" style="position: absolute;
           z-index: ${piece.z};
           background-color: #f1f1f1;
           border: 1px solid #d3d3d3;
           text-align: center;
+
           top: ${piece.position.top};
-          left: ${piece.position.left};"><div class="draggableheader" id="furniture-${index}-header" style="cursor: move; padding: 5px; z-index: ${piece.z};">${piece.title}</div><a id="furniture-${index}-a" href="${piece.url}"><img id="furniture-${index}-img" src="${piece.iconUrl}" class="testImage" style="padding: 5px;
-          padding: 25px;
+          left: ${piece.position.left};"><div class="draggableheader" id="furniture-${index}-header" style="cursor: move; padding: 5px; z-index: ${piece.z};">${piece.title}</div><a id="furniture-${index}-a" href="${piece.url}" ><img id="furniture-${index}-img" src="${piece.iconUrl}" class="testImage" style="padding: 5px;
+          padding: ${piece.padding}px;
+          object-fit: fill;
           background-color: ${piece.color};
-          color: #fff;
-          width: ${piece.width}; height: ${piece.height};"></a></div>`;
+           width: ${piece.width}; height: ${piece.height};
+          color: #fff;"></a></div>`;
           furnitureContainer.innerHTML += pieceHTML;
         });
 
