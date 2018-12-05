@@ -9,6 +9,14 @@
         <p>{{follow_status}}</p>
       </div>
     </div>
+    <div @click="customizeUser(user.uid)" v-else class="grid-item item1">
+      <div >
+        <img src="../assets/logo.png" style="width: 50px; height: 50px"/>
+        <!--<p >follow</p>-->
+
+        <p>Customization</p>
+      </div>
+    </div>
     <div class="grid-item item4">
       <div @click="goToRoom(user.displayName)">
         <img src="../assets/logo.png" style="width: 50px; height: 50px;"/>
@@ -19,7 +27,7 @@
     <div  class="grid-item item2">
       <h2 v-if="user.displayName">{{this.user.displayName}}</h2>
       <p v-if="user.email">{{this.user.email}}</p>
-      <img v-if="user.photoURL" :src="user.photoURL" alt="no profile image" style="max-height:300px; max-width:300px;" /><br>
+      <img v-if="user.photoURL" :src="user.photoURL" alt="no profile image" style="max-height:300px; max-width:300px;" ><br>
     </div>
     <div class="grid-item item3">
       <div><p id="friendLabel">Following:</p>
@@ -70,9 +78,10 @@
       Icon,
     },
     methods: {
-      goToUserPage: function(name) {
-        alert("Go to " + name + "'s room?");
+      customizeUser: function(userID){
+        this.$router.push({ path: `/user-customization/` });
       },
+
       goToFollowedPage: function(name) {
         //console.log("name", name);
         this.$router.push({ path: `/home/${name}` });

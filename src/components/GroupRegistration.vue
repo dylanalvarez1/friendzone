@@ -63,10 +63,10 @@ export default {
   name: 'groupRegistration',
   data: function() {
     return {
-      uid: firebase.auth().currentUser.email.replace(".",""),
+      uid: firebase.auth().currentUser.uid,
       groupName: "",
       groupDescription: "",
-      groupPicture: new File(),
+      groupPicture: new file(),
       attemptedSubmission: false,
       group_ref:"",
       group_key:"",
