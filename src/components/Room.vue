@@ -6,14 +6,15 @@
   <div id="furniture-container" class="item2"></div>
 
   <!--Toolbar-->
-  <div id="decorator" class="item3">Decorate:
+  <div id="decorator" style="text-align:center" class="item3">Decorate:
     <button @click="createFurniture">Add furniture</button>
     <!--button @click="enterRoomModify">Modify room</button-->
   </div>
 
   <!--Modify Events-->
-  <div id="f-modifier" class="item3" style="display: none">Modify Furniture:
+  <div id="f-modifier" class="item3" style="display: none; text-align: center">Modify Furniture:
     <form>
+      <br>
       <button @click="exitFurnitureModify" style="width: 50%">Back</button><br><br>
       <label>Title</label><input type="text" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.title"><br>
       <label>Link</label><input type="url" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.url"><br>
@@ -34,8 +35,6 @@
       <label>Title</label><input type="text" v-model="modr.new.title"><br><br>
       <label>Background Color</label><input type="color" v-model="modr.new.color"><br><br>
       <label>Wallpaper URL</label><input type="url" v-model="modr.new.wallpaper">
-
-
     </form>
   </div>
 
