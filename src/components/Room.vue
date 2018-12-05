@@ -35,8 +35,6 @@
       <label>Title</label><input type="text" v-model="modr.new.title"><br><br>
       <label>Background Color</label><input type="color" v-model="modr.new.color"><br><br>
       <label>Wallpaper URL</label><input type="url" v-model="modr.new.wallpaper">
-
-
     </form>
   </div>
 
