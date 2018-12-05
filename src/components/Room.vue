@@ -12,11 +12,27 @@
       </div>
     </div-->
   </div>
-  <div class="item3">Decorate:
+
+  <!--Toolbar-->
+  <div id="decorator" class="item3">Decorate:
     <button @click="createFurniture">Add furniture</button>
-    <button>Modify furniture</button>
+    <button @click="enterFurnitureModify">Modify furniture</button>
     <button @click="deleteFurniture">Delete furniture</button>
   </div>
+
+  <!--Modify Events-->
+  <div id="modifier" class="item3" style="display: none">Modify Furniture:
+    <button @click="exitFurnitureModify">Back</button>
+    <button @click="saveFurnitureModifications">Save changes</button><br><br>
+    <label>Name</label><input type="text"><br>
+    <label>URL</label><input type="url"><br>
+    <label>Color</label><input type="color"><br>
+    <label>Z-index</label><input type="number"><br><br>
+    <label>Width</label><input type="range">
+    <label>Height</label><input type="range">
+  </div>
+
+
   <div class="item4">footer:</div>
 </div>
 </template>
@@ -36,6 +52,7 @@ export default {
       pos4: 0,
       room: "",
       activeFurnitureIndex: -1,
+
       /*user : {
          "photoURL": "",
          "displayName": "",
@@ -89,6 +106,10 @@ export default {
       });
     },
 
+    //populateRoom => renderFurniture => makeAllDraggable
+
+    //umbrella function
+    //gets the data for the room ready
     populateRoom: function(callback) {
       firebase.database()
         .ref(`/rooms/${GROUP_ID}`)
@@ -145,24 +166,19 @@ export default {
       currentRoom.furniture = tempList;
 
       this.room = currentRoom;
-      this.saveRoomState(this.renderFurniture);
+      this.saveRoomState();
+      this.renderFurniture();
+      this.selectFurniture(currentRoom.furniture.length-1);
+      this.enterFurnitureModify();
     },
 
     deleteFurniture: function(){
       this.room.furniture.splice(this.activeFurnitureIndex, 1);
       this.activeFurnitureIndex = -1;
-      this.saveRoomState(this.renderFurniture)
+      this.saveRoomState();
 
       //this is copy-pasted from mounted run
-      this.populateRoom(() => {
-        console.log("calllbackkk");
-        const elmnts = document.getElementsByClassName("draggable");
-        console.log(elmnts.length);
-        for (let i = 0; i < elmnts.length; i++){
-          console.log(i);
-          this.dragElement(elmnts[i]);
-        }
-      });
+      this.populateRoom();
     },
 
     saveRoomState: function(callback) {
@@ -171,6 +187,8 @@ export default {
       if (callback) callback();
     },
 
+    //populates with html. in hindsight, this should make them draggable too
+    //makes all draggable
     renderFurniture: function(callback) {
       //place to insert the furniture
       const furnitureContainer = document.getElementById("furniture-container");
@@ -191,7 +209,7 @@ export default {
           width: 100px; height: 100px;"></a></div>`;
           furnitureContainer.innerHTML += pieceHTML;
         });
-        if (callback) callback();
+        this.makeAllDraggable(callback);
     },
 
     dragElement: function(elmnt){
@@ -266,29 +284,46 @@ export default {
     },
 
     selectFurniture: function(index){
+      if (this.activeFurnitureIndex === index) return;
       //DESELECT FURNITURE
       if (this.activeFurnitureIndex !== -1)
         document.getElementById(`furniture-${this.activeFurnitureIndex}`).style.fontWeight = "initial";
+
+      this.exitFurnitureModify();
 
       this.activeFurnitureIndex = index;
 
       //SELECT FURNITURE
       document.getElementById(`furniture-${this.activeFurnitureIndex}`).style.fontWeight = "bold";
+    },
+
+    enterFurnitureModify: function(){
+      if (this.activeFurnitureIndex === -1) return;
+      document.getElementById("decorator").style.display = "none";
+      document.getElementById("modifier").style.display = "block";
+    },
+
+    saveFurnitureModifications: function(){
+
+    },
+
+    exitFurnitureModify: function(){
+      document.getElementById("modifier").style.display = "none";
+      document.getElementById("decorator").style.display = "block";
+    },
+
+    makeAllDraggable: function(callback){
+      const elmnts = document.getElementsByClassName("draggable");
+      for (let i = 0; i < elmnts.length; i++)
+        this.dragElement(elmnts[i]);
+      if (callback) callback();
     }
 
   },
   mounted: function() {
 
     this.getUser();
-    this.populateRoom(() => {
-      console.log("calllbackkk");
-      const elmnts = document.getElementsByClassName("draggable");
-      console.log(elmnts.length);
-      for (let i = 0; i < elmnts.length; i++){
-        console.log(i);
-        this.dragElement(elmnts[i]);
-      }
-    });
+    this.populateRoom();
 
     console.log("props: ", this.username);
   },
@@ -376,5 +411,14 @@ export default {
 }
 
 .selected-h {
+}
+
+#modifier *{
+  font-size: 11px;
+  width: 90%;
+}
+
+#modifier button{
+  width: 100%;
 }
 </style>
