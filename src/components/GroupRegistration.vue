@@ -138,8 +138,8 @@ export default {
       // console.log(newRoom);
        this.group_ref=firebase.database().ref('groups').push();
        this.group_key=this.group_ref.key;
-      this.room_ref=firebase.database().ref(`rooms/${}`);
-      this.room_key=this.room_ref.key;
+      this.room_ref=firebase.database().ref(`rooms/${this.group_key}`);
+      this.room_key=this.group_key;
       const iconUrl = this.uploadPicture();
 
 
