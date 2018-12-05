@@ -1,18 +1,9 @@
 <template>
 <div class="grid-container">
-  <div class="item1">header:
-    <div>
-      {{room.title}}
-      (debug) furniture index {{activeFurnitureIndex}}
-    </div>
-  </div>
-  <div id="furniture-container" class="item2">Room:
-    <!--div v-for="(piece, index) in room.furniture" :id="'f' + index" class="draggable">
-      <div :id="'f' + index+'-header'" class="draggableheader">
-        <a href="../assets/logo.png" download><img src="https://i.imgur.com/dQemleO.jpg?1" class="testImage"></a>
-      </div>
-    </div-->
-  </div>
+
+  <div class="item1">{{room.title}}</div>
+
+  <div id="furniture-container" class="item2"></div>
 
   <!--Toolbar-->
   <div id="decorator" class="item3">Decorate:
@@ -49,7 +40,7 @@
   </div>
 
 
-  <div class="item4">footer:</div>
+  <div class="item4"></div>
 </div>
 </template>
 
@@ -154,26 +145,33 @@ export default {
         .then(snapshot => {
           //set the room
           this.room = snapshot.val();
-          this.pieces = this.room.furniture;
+          this.verifyFurnitureIsArray(this.room.furniture);
+          this.furniture = this.room.furniture || [];
           console.log("snapshot.val()" + snapshot.val());
 
           //initialize room furniture if nonexistent
-          if (!this.room.furniture && this.room.furniture !== []) this.initializeFurniture();
+          if (this.room.furniture === []) this.initializeFurniture();
           //else callback();
 
-          this.furniture = this.room.furniture;
 
 
 
           //for each furniture, render on the page
           //document.getElementById("furniture-container").innerHTML = "";
-          this.renderFurniture(callback);
+          else this.renderFurniture(callback);
           //this.room.furniture.forEach((piece, index) => this.renderFurniture(piece, index));
         });
     },
 
     initializeFurniture: function(callback) {
-      this.room.furniture = [];
+      this.room.furniture = [JSON.parse(JSON.stringify(this.DEFAULT_FURNITURE))];
+    },
+
+    verifyFurnitureIsArray: function(furniture){
+      if (furniture.forEach) return;
+      let array = [];
+      this.room.furniture = Object.keys(this.room.furniture).filter(key => key >= 0).forEach(key => array.push(this.room.furniture[key]));
+      this.room.furniture = array;
     },
 
     createFurniture: function() {
@@ -209,9 +207,10 @@ export default {
     //makes all draggable
     renderFurniture: function(callback) {
       //place to insert the furniture
+      console.log("f: " + JSON.stringify(this.room.furniture));
       const furnitureContainer = document.getElementById("furniture-container");
-      furnitureContainer.innerHTML = "Room:";
-      if (!this.room.furniture.forEach) return;
+      furnitureContainer.innerHTML = "";
+      //if (!this.room.furniture.forEach) return;
         this.room.furniture.forEach((piece, index) => {
           const DOG_URL = "https://i.imgur.com/dQemleO.jpg?1";
           const pieceHTML = `<div id="furniture-${index}"class="draggable" style="position: absolute;
@@ -391,7 +390,7 @@ export default {
   },
   mounted: function() {
 
-    this.getUser();
+    //this.getUser();
     this.populateRoom();
 
     console.log("props: ", this.username);
@@ -427,30 +426,38 @@ export default {
     '. room room room . control'
     'footer footer footer footer footer footer';
 
-  grid-template-rows: 100px 200px 200px 50px;
-  grid-template-columns: 50px 1fr 1fr 1fr 50px 125px;
+  grid-template-rows: 100px 250px 250px 50px;
+  grid-template-columns: 50px 1fr 1fr 1fr 50px 150px;
 
 }
 
 .item1 {
   grid-area: header;
   border-style: solid;
+  font-size: 50px;
+  background-color: #2196F3;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
 }
 
 .item2 {
   grid-area: room;
-  border-style: solid;
+  border-style: solid
 
 }
 
 .item3 {
   grid-area: control;
   border-style: solid;
+  background-color: #2196F3;
+  color: white;
+  padding: 5px;
+
 }
 
 .item4 {
   grid-area: footer;
-  border-style: solid;
 }
 
 .testImage {
@@ -483,15 +490,16 @@ export default {
 }
 
 #f-modifier *{
-  font-size: 11px;
+  font-size: 15px;
   width: 90%;
+  margin-bottom: 2px;
 }
 
 #f-modifier button{
   width: 100%;
 }
 #r-modifier *{
-  font-size: 11px;
+  font-size: 15px;
   width: 90%;
 }
 
