@@ -17,8 +17,8 @@
         <p>Customization</p>
       </div>
     </div>
-    <div class="grid-item item4">
-      <div @click="goToRoom(user.displayName)">
+    <div @click="goToRoom(user.displayName)" class="grid-item item4">
+      <div >
         <img src="../assets/logo.png" style="width: 50px; height: 50px;"/>
         <p>Go to room</p>
       </div>
