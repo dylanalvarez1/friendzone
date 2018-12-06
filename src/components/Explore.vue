@@ -4,7 +4,7 @@
     <hr>
     <div class="container" style="display: inline; float: left; width: 100%; margin-top: 50px;">
       <button @click="createGroup">Register a new group</button>
-      <input placeholder="Search" v-model="query" @keyup.enter="queryDatabase"/>
+      <input placeholder="Search" v-model="query" @input="queryDatabase" @click="queryIfEmpty" @keyup.enter="queryDatabase"/>
       <select @change="queryDatabase" v-model="selected">
         <option selected value="">No filter</option>
         <option value="users">Users</option>
@@ -35,7 +35,7 @@
           <img id="icon" :src="group.iconURL" alt="Avatar" class="image friendPic">
           <div class="middle iconLabel">
             <div id="iconLabel" class="text">
-              {{group.description}}
+              {{group.title}}
             </div>
           </div>
         </div>
@@ -95,6 +95,10 @@
       createGroup: function() {
        this.$router.push({ path: `/group-registration/` });
       },
+      queryIfEmpty: function() {
+        console.log("queyr if empty: ", this.query);
+        if (this.query == "") this.queryDatabase();
+      },
       queryDatabase: function() {
         this.results = [];
         this.users = [];
@@ -103,7 +107,7 @@
         console.log("selected: ", this.selected);
         if(this.query != "") {
           if(this.selected == "") {
-            firebase.database().ref('/groups/').orderByChild("title").equalTo(this.query).once('value').then((snapshot) => {
+            firebase.database().ref('/groups/').orderByChild("title").startAt(this.query).endAt(`${this.query}\uf8ff`).once('value').then((snapshot) => {
               console.log("group serach");
               let response = snapshot.val();
               console.log(response);
@@ -129,14 +133,14 @@
               });
             });
 
-            firebase.database().ref('/users/').orderByChild("displayName").equalTo(this.query).once('value').then((snapshot) => {
+            firebase.database().ref('/users/').orderByChild("displayName").startAt(this.query).endAt(`${this.query}\uf8ff`).once('value').then((snapshot) => {
               let response = snapshot.val();
               this.users = response;
               console.log("this.users: ", this.users);
             });
           }
           else if(this.selected == "groups") {
-            firebase.database().ref('/groups/').orderByChild("title").equalTo(this.query).once('value').then((snapshot) => {
+            firebase.database().ref('/groups/').orderByChild("title").startAt(this.query).endAt(`${this.query}\uf8ff`).once('value').then((snapshot) => {
               console.log("group serach");
               let response = snapshot.val();
               console.log(response);
@@ -163,7 +167,7 @@
             });
           }
           else if(this.selected == "users") {
-            firebase.database().ref('/users/').orderByChild("displayName").equalTo(this.query).once('value').then((snapshot) => {
+            firebase.database().ref('/users/').orderByChild("displayName").startAt(this.query).endAt(`${this.query}\uf8ff`).once('value').then((snapshot) => {
               let response = snapshot.val();
               this.users = response;
               console.log("this.users: ", this.users);
@@ -172,7 +176,7 @@
         }
         else {
           if(this.selected == "") {
-            firebase.database().ref('/groups/').orderByChild("title").once('value').then((snapshot) => {
+            firebase.database().ref('/groups/').orderByChild("title").startAt(this.query).endAt(`${this.query}\uf8ff`).once('value').then((snapshot) => {
                console.log("group serach");
               let response = snapshot.val();
               console.log(response);
@@ -198,14 +202,14 @@
               });
             });
 
-            firebase.database().ref('/users/').orderByChild("displayName").once('value').then((snapshot) => {
+            firebase.database().ref('/users/').orderByChild("displayName").startAt(this.query).endAt(`${this.query}\uf8ff`).once('value').then((snapshot) => {
               let response = snapshot.val();
               this.users = response;
               console.log("this.users: ", this.users);
             });
           }
           else if(this.selected == "groups") {
-            firebase.database().ref('/groups/').orderByChild("title").once('value').then((snapshot) => {
+            firebase.database().ref('/groups/').orderByChild("title").startAt(this.query).endAt(`${this.query}\uf8ff`).once('value').then((snapshot) => {
               console.log("group serach");
               let response = snapshot.val();
               console.log(response);
@@ -233,7 +237,7 @@
             });
           }
           else if(this.selected == "users") {
-            firebase.database().ref('/users/').orderByChild("displayName").once('value').then((snapshot) => {
+            firebase.database().ref('/users/').orderByChild("displayName").startAt(this.query).endAt(`${this.query}\uf8ff`).once('value').then((snapshot) => {
               let response = snapshot.val();
               this.users = response;
               console.log("this.users: ", this.users);

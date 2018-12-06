@@ -37,7 +37,7 @@
       </div>
       <div><p id="groupLabel">Groups:</p>
           <div id="groupList" v-for="group in groups" :key="group.groupID" class="container" @click="goToGroupPage(group.groupID)">
-            <Icon :url="group.iconURL" :label="group.groupID"></Icon>
+            <Icon :url="group.iconURL" :label="group.title"></Icon>
           </div>
       </div>
 
