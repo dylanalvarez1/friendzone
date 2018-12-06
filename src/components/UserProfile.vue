@@ -296,7 +296,7 @@
 
   .container {
     position: relative;
-    width: 5%;
+
   }
 
   .image {
