@@ -6,7 +6,7 @@
   <div id="furniture-container" class="item2"></div>
 
   <!--Toolbar-->
-  <div id="decorator" style="text-align:center" class="item3">Decorate:
+  <div  v-if="moderator || member" id="decorator" style="text-align:center" class="item3">Decorate:
     <button @click="createFurniture">Add furniture</button>
     <!--button @click="enterRoomModify">Modify room</button-->
   </div>
@@ -78,6 +78,7 @@ export default {
        },*/
       params: undefined,
       moderator: false,
+      member: false,
       furniture: [],
       DEFAULT_FURNITURE: {
         title: "Welcome!",
@@ -411,10 +412,16 @@ export default {
             console.log("response:", response);
             let newResponse = snapshot2.val()
             let tempArray = newResponse.moderators;
+            let tempArray2 = newResponse.members;
             console.log("temp array:", tempArray);
             tempArray.forEach(user => {
               if(user == firebase.auth().currentUser.uid) {
                 this.moderator = true;
+              }
+            });
+            tempArray2.forEach(user => {
+              if(user == firebase.auth().currentUser.uid) {
+                this.member = true;
               }
             });
           });
