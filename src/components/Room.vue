@@ -404,17 +404,26 @@ export default {
     },
     checkCred(uid) {
        console.log("checking credentials of: ", uid);
-       firebase.database().ref('/groups/' + this.$route.params.ownerID).once('value').then((snapshot) => {
+       firebase.database().ref('/rooms/' + this.$route.params.ownerID).once('value').then((snapshot) => {
         let response = snapshot.val();
-        console.log("response:", response);
-        let tempArray = response.moderators;
-        console.log("temp array:", tempArray);
-        tempArray.forEach(user => {
-          if(user == firebase.auth().currentUser.uid) {
+        if(response.group == true) {
+          firebase.database().ref('/groups/' + this.$route.params.ownerID).once('value').then((snapshot2) => {
+            console.log("response:", response);
+            let newResponse = snapshot2.val()
+            let tempArray = newResponse.moderators;
+            console.log("temp array:", tempArray);
+            tempArray.forEach(user => {
+              if(user == firebase.auth().currentUser.uid) {
+                this.moderator = true;
+              }
+            });
+          });
+        }
+        else { //This is a user room
+          if(this.$route.params.ownerID == firebase.auth().currentUser.uid) {
             this.moderator = true;
           }
-
-        });
+        }
       });
     }
 
