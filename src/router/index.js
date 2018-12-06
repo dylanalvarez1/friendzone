@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Explore from '@/components/Explore'
 import GroupRegistration from '@/components/GroupRegistration'
 import UserCustomization from '@/components/UserCustomization'
-import HelloWorld from '@/components/HelloWorld'
+import GroupCustomization from '@/components/GroupCustomization'
 import Login from '@/components/Login'
 import SignUp from '@/components/SignUp'
 import UserProfile from '@/components/UserProfile'
@@ -57,6 +57,14 @@ let router = new Router({
       path: '/user-customization',
       name: 'User Customization',
       component: UserCustomization,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/group-customization/:groupID',
+      name: 'Group Customization',
+      component: GroupCustomization,
       meta: {
         requiresAuth: true
       }

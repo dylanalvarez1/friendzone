@@ -82,7 +82,8 @@ export default {
       owner: undefined,
       params: "",
       group_status:"join group",
-      dialog: null
+      dialog: null,
+      authorization: null,
     }
   },
   components: {
@@ -274,6 +275,15 @@ export default {
               firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
               this.admins.push(snapshot.val());
               });
+            }).then(()=>{
+              if(this.owner===firebase.auth().currentUser.uid){
+                this.authorization="owner";
+              }
+              else if(this.admins.includes(firebase.auth().currentUser.uid)){
+                this.authorization="admin";
+              }else{
+                this.authorization="member";
+              }
             });
             //console.log("end of big statement");
 
