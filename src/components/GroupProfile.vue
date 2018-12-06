@@ -186,14 +186,22 @@ export default {
     goToFollowedPage: function(name) {
       this.$router.push({ path: `/home/${name}` });
     },
-    customizeGroupProfile: function(groupName) {
-      let authorization = "member";
-      if(authorization === "admin") {
-        alert("You can customize this profile");
-      }
-      else {
-        alert("You cannot edit this profile, this also means you shouldnt see this");
-      }
+    customizeGroupProfile: function(groupId) {
+      console.log("in customize group profile route", groupId);
+       firebase.database().ref('/groups/' + groupId).once('value').then((snapshot) => {
+        let response = snapshot.val();
+        console.log("response:", response);
+        let tempArray = response.moderators;
+        console.log("temp array:", tempArray);
+        tempArray.forEach(user => {
+          if(user == firebase.auth().currentUser.uid) {
+            alert("YOU HAVE ACCESS TO MODIFY");
+          }
+          else {
+            alert("You must be a moderator of this group to customize this page");
+          }
+        });
+      });
     },
     getGroup: function() {
       //Gets the correct user by checking if there is a router param and then calls getUserById (firebase call)
@@ -342,7 +350,9 @@ export default {
 
   .container {
     position: relative;
-    width: 5%;
+    cursor: pointer;
+     width: 100%;
+  max-width: 100px;
   }
 
   .image {

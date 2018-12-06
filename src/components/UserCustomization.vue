@@ -8,11 +8,6 @@
             <p>Current Icon</p>
             <div id="groupList"  class="container">
               <img id="groupIcon" :src="currentImageSrc" alt="Avatar" class="image groupPic" style="width:100%">
-              <!--<div class="middle iconLabel">-->
-                <!--<div id="iconLabel" class="text">-->
-                  <!--{{currentUserUid}}-->
-                <!--</div>-->
-              <!--</div>-->
             </div>
           </div>
         </div>

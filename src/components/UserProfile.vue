@@ -37,7 +37,7 @@
       </div>
       <div><p id="groupLabel">Groups:</p>
           <div id="groupList" v-for="group in groups" :key="group.groupID" class="container" @click="goToGroupPage(group.groupID)">
-            <Icon :url="group.iconURL" :label="group.groupID"></Icon>
+            <Icon :url="group.iconURL" :label="group.title"></Icon>
           </div>
       </div>
 
@@ -296,7 +296,9 @@
 
   .container {
     position: relative;
-    width: 5%;
+    cursor: pointer;
+     width: 100%;
+  max-width: 100px;
   }
 
   .image {
@@ -328,13 +330,7 @@
     opacity: 1;
   }
 
-  .text {
-    background-color: #4CAF50;
-    color: white;
-    font-size: 16px;
-    padding: 16px 32px;
 
-  }
 
   #friendLabel {
     vertical-align: top;
