@@ -74,18 +74,16 @@ export default {
       let group_member_ref=firebase.database().ref().child(`groups/${groupID}/members`);
       let current_user_ref=firebase.database().ref().child(`users/${firebase.auth().currentUser.uid}/groups`);
 
+
+
       let current_group_member_data=[];
       let user_uid=firebase.auth().currentUser.uid;
       group_member_ref.once('value').then(function(snapshot) {
-
         snapshot.forEach(function (child) {
           current_group_member_data.push(child.val());
         });
         if(current_group_member_data.includes(user_uid)){
           current_group_member_data.splice(current_group_member_data.indexOf(user_uid),1);
-
-
-
         }else {
           current_group_member_data.push(user_uid);
         }
