@@ -1,5 +1,5 @@
 <template>
-  <div class="groupProfile">
+  <div class="groupProfile" id="root_group_div">
     <div class="grid-container">
       <div class="grid-item item1" @click="joinGroup(group.groupID)">
         <div >
@@ -39,6 +39,24 @@
         </div>
       </div>
     </div>
+    <a11y-dialog
+      id="main-dialog"
+      app-root="#root_group_div"
+      @dialog-ref="assignDialogReference"
+      :class-names="{}"
+    >
+
+      <h1 style="color: #ff7895" slot="title">WARMING</h1>
+      <div>
+        You are the owner of this group. You leaving the group will disband the group, do you want to proceed?
+      </div>
+      <div>
+        <button type="button" data-a11y-dialog-hide="main-dialog" v-on:click="disband_group" aria-label="Close the dialog">Proceed</button>
+      </div>
+      <span slot="closeButtonContent">
+        Cancel
+      </span>
+    </a11y-dialog>
   </div>
 </template>
 
@@ -61,56 +79,103 @@ export default {
       members: undefined,
       admins: undefined,
       group: undefined,
+      owner: undefined,
       params: "",
-      group_status:"join group"
+      group_status:"join group",
+      dialog: null
     }
   },
   components: {
       Icon,
     },
   methods: {
+    disband_group:function(){
+      alert('disbanding');
+      let group_id=this.group.groupID;
+      this.members.forEach(member=>{
+        let individual_member_ref=firebase.database().ref().child(`users/${member.uid}`);
+        individual_member_ref.once('value').then(snapshot=>{
+          let user=snapshot.val();
+          if(user.hasOwnProperty('groups')){
+            if(user.groups.includes(group_id)) {
+              user.groups.splice(user.groups.indexOf(group_id), 1);
+            }
+          }
+          individual_member_ref.set(user);
+        })
+      });
+      firebase.database().ref().child(`rooms`).once('value').then(snapshot=>{
+        let rooms=snapshot.val();
+        Object.keys(rooms).forEach(function(key){
+          if(key===group_id){
+            firebase.database().ref().child(`rooms`).child(key).remove();
+          }
+        });
+      });
+      firebase.database().ref().child(`groups`).once('value').then(snapshot=>{
+        let groups=snapshot.val();
+        Object.keys(groups).forEach(function(key){
+          if(key===group_id){
+            firebase.database().ref().child(`groups`).child(key).remove();
+          }
+        });
+      })
+      .then(()=>{
+        let space = firebase.auth().currentUser.uid;
+        this.$router.push({ path: `/home/${space}` });
+      });
+    },
+    assignDialogReference(dialog) {
+      this.dialog = dialog
+    },
+
+    openMainDialog() {
+      if (this.dialog) {
+        this.dialog.show()
+      }
+    },
     joinGroup: function(groupID) {
       // alert('Joined '+groupName);
-      let group_member_ref=firebase.database().ref().child(`groups/${groupID}/members`);
-      let current_user_ref=firebase.database().ref().child(`users/${firebase.auth().currentUser.uid}/groups`);
 
-      let current_group_member_data=[];
-      let user_uid=firebase.auth().currentUser.uid;
-      group_member_ref.once('value').then(function(snapshot) {
-
-        snapshot.forEach(function (child) {
-          current_group_member_data.push(child.val());
+      if(this.owner===firebase.auth().currentUser.uid){
+        this.openMainDialog();
+      }else {
+        let group_member_ref=firebase.database().ref().child(`groups/${groupID}/members`);
+        let current_user_ref=firebase.database().ref().child(`users/${firebase.auth().currentUser.uid}/groups`);
+        let current_group_member_data = [];
+        let user_uid = firebase.auth().currentUser.uid;
+        group_member_ref.once('value').then(function (snapshot) {
+          snapshot.forEach(function (child) {
+            current_group_member_data.push(child.val());
+          });
+          if (current_group_member_data.includes(user_uid)) {
+            current_group_member_data.splice(current_group_member_data.indexOf(user_uid), 1);
+          } else {
+            current_group_member_data.push(user_uid);
+          }
+          group_member_ref.set(current_group_member_data);
         });
-        if(current_group_member_data.includes(user_uid)){
-          current_group_member_data.splice(current_group_member_data.indexOf(user_uid),1);
+        let current_user_group_data = [];
 
-
-
-        }else {
-          current_group_member_data.push(user_uid);
-        }
-        group_member_ref.set(current_group_member_data);
-      });
-      let current_user_group_data=[];
-
-      current_user_ref.once('value').then((snapshot)=>{
-        snapshot.forEach(function (child) {
-          current_user_group_data.push(child.val());
+        current_user_ref.once('value').then((snapshot) => {
+          snapshot.forEach(function (child) {
+            current_user_group_data.push(child.val());
+          });
+          if (current_user_group_data.includes(groupID)) {
+            current_user_group_data.splice(current_user_group_data.indexOf(groupID), 1);
+          } else {
+            current_user_group_data.push(groupID);
+          }
+          current_user_ref.set(current_user_group_data);
         });
-        if(current_user_group_data.includes(groupID)){
-          current_user_group_data.splice(current_user_group_data.indexOf(groupID),1);
-        }else {
-          current_user_group_data.push(groupID);
-        }
-        current_user_ref.set(current_user_group_data);
-      });
 
-      if(this.group_status==="join group"){
-        this.group_status="leave group";
-      }else if(this.group_status==="leave group"){
-        this.group_status="join group";
+        if (this.group_status === "join group") {
+          this.group_status = "leave group";
+        } else if (this.group_status === "leave group") {
+          this.group_status = "join group";
+        }
+        this.getGroupById(groupID);
       }
-      this.getGroupById(groupID);
 
     },
     goToRoom: function(groupID) {
@@ -185,6 +250,10 @@ export default {
 
             this.members = []; //empty the array before filling it with user info
             this.admins = [];
+            this.owner="";
+            if(this.group.hasOwnProperty('ownerID')){
+              this.owner=this.group.ownerID;
+            }
             this.group.members.forEach(member => {
               let tempId = member.replace(".","");
               firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
@@ -426,5 +495,13 @@ export default {
   .item5:hover {
      background-color: rgba(152, 170, 206, 0.925);
   }
+ #root_group_div {
+   font-family: 'Avenir', Helvetica, Arial, sans-serif;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+   text-align: center;
+   color: #2c3e50;
+   margin-top: 60px;
+ }
 
 </style>
