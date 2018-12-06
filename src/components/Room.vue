@@ -6,7 +6,7 @@
   <div id="furniture-container" class="item2"></div>
 
   <!--Toolbar-->
-  <div  v-if="moderator || member" id="decorator" style="text-align:center" class="item3">Decorate:
+  <div  v-if="moderator || member || admin" id="decorator" style="text-align:center" class="item3">Decorate:
     <button @click="createFurniture">Add furniture</button>
     <!--button @click="enterRoomModify">Modify room</button-->
   </div>
@@ -24,7 +24,7 @@
       <label>Padding</label><input type="number" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" min="0" max="100" v-model="mod.new.padding"><br><br>
       <label>Width</label><input type="text" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.width">
       <label>Height</label><input type="text" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.height"><br><br>
-      <button v-if="moderator" @click="deleteFurniture" style="background-color: red; color: ; font-weight: bold;">Delete furniture</button><br><br>
+      <button v-if="moderator || admin" @click="deleteFurniture" style="background-color: red; color: ; font-weight: bold;">Delete furniture</button><br><br>
     </form>
   </div>
 
@@ -79,6 +79,8 @@ export default {
       params: undefined,
       moderator: false,
       member: false,
+      admin: false,
+      uid: "",
       furniture: [],
       DEFAULT_FURNITURE: {
         title: "Welcome!",
@@ -96,47 +98,19 @@ export default {
   },
   props: ['username'],
   methods: {
-    getUser: function () {
-      //Gets the correct user by checking if there is a router param and then calls getUserById (firebase call)
-
-      console.log("route params:", this.$route.params.ownerID);
-      this.params=this.$route.params.ownerID;
-
-
-      if (this.params != undefined && this.params != " ") {
-        //This is when you visit another profile, there is a path param in the route
-        console.log("In getUser call with route params");
-        const userId = this.params;
-        console.log("userId", userId);
-        this.getUserById(userId);
-      } else {
-        //default call with no router params
-        console.log("In getUser call where there is no route params");
-        const userId = firebase.auth().currentUser.email.replace(".", "");
-        console.log("userId", userId);
-        this.getUserById(userId);
-      }
-
-    },
 
     getUserById: function(userId) {
       firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
-        this.user = snapshot.val();
+        let response = snapshot.val();
         console.log(snapshot.val());
-        console.log(this.user);
-        //console.log(this.user.following);
 
-      }).then(() => {
-        this.friends = []; //empty the array before filling it with user info
-        this.user.following.forEach(friend => {
-          let tempId = friend.replace(".", "");
-          firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
-            this.friends.push(snapshot.val());
+        if(response.admin) {
+          this.admin = true;
+        }
 
-          });
 
-        });
       });
+
     },
 
     //populateRoom => renderFurniture => makeAllDraggable
@@ -430,6 +404,7 @@ export default {
           if(this.$route.params.ownerID == firebase.auth().currentUser.uid) {
             this.moderator = true;
           }
+          this.getUserById(firebase.auth().currentUser.uid)
         }
       });
     }
