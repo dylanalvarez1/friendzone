@@ -23,18 +23,18 @@
     <div id="resultSet">
       <h1 v-if="results != []" style="color: white;">Results:</h1>
       <div v-if="!checked">
-        <div id="resultsList" v-for="user in users" :key="user.uid" class="container" @click="goToUserPage(user.uid)">
-          <img id="icon" :src="user.photoURL" alt="Avatar" class="image friendPic">
+        <div id="resultsList" v-for="user in users" :key="user.uid" class="containerIcon" style="cursor: pointer;" @click="goToUserPage(user.uid)">
+          <img :src="user.photoURL" alt="No image" class="image">
           <div class="middle iconLabel">
-            <div id="iconLabel" class="text">
+            <div class="text">
               {{user.displayName}}
             </div>
           </div>
         </div>
-        <div id="resultsList" v-for="group in groups" :key="group.groupID" class="container" @click="goToGroupPage(group.groupID)">
-          <img id="icon" :src="group.iconURL" alt="Avatar" class="image friendPic">
+        <div id="resultsList" v-for="group in groups" :key="group.groupID" class="containerIcon" style="cursor: pointer;" @click="goToGroupPage(group.groupID)">
+          <img :src="group.iconURL" alt="No image" class="image friendPic">
           <div class="middle iconLabel">
-            <div id="iconLabel" class="text">
+            <div class="text">
               {{group.title}}
             </div>
           </div>
@@ -277,6 +277,29 @@
 
 <style scoped>
 
+* {box-sizing: border-box;}
+#friendLabel {
+    vertical-align: top;
+    display: inline-block;
+    margin-right: 5px;
+  }
+.containerIcon {
+  position: relative;
+  width: 5%;
+}
+
+.containerIcon:hover .text {
+  opacity: 1;
+}
+
+.containerIcon:hover .image {
+    opacity: 0.3;
+  }
+
+  .containerIcon:hover .middle {
+    opacity: 1;
+  }
+
   #title {
     text-align: center;
   }
@@ -348,15 +371,18 @@
   }
 
   .middle {
-    transition: .5s ease;
-    opacity: 0;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    text-align: center;
-
+  position: absolute;
+  bottom: 0;
+  background: rgb(0, 0, 0);
+  background: rgba(0, 0, 0, 0.5); /* Black see-through */
+  color: #f1f1f1;
+  width: 100%;
+  transition: .5s ease;
+  opacity:0;
+  color: white;
+  font-size: 12px;
+  padding: 0px;
+  text-align: center;
   }
 
   .container:hover .image {
@@ -367,13 +393,7 @@
     opacity: 1;
   }
 
-  .text {
-    background-color: #4CAF50;
-    color: white;
-    font-size: 16px;
-    padding: 16px 32px;
 
-  }
 
   #iconLabel {
     vertical-align: bottom;

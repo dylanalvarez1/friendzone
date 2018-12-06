@@ -45,8 +45,10 @@
 
 <script>
 import firebase from 'firebase'
+//import functions from 'firebase-functions'
 
 const GROUP_ID = "4f71f44b-dca2-4997-bf13-311459912f25";
+const functions = console.log(firebase);
 
 export default {
   name: 'room',
@@ -405,8 +407,16 @@ export default {
 
     // this.getUser();
     this.populateRoom();
+    functions.database.ref('/room/')
+    .onWrite(event => {
+     const getSomethingPromise = admin.database().ref(`/rooms/`).once('value');
 
-    console.log("props: ", this.username);
+     return getSomethingPromise.then(results => {
+        const somethingSnapshot = results[0];
+        console.log("update happened: ", somethingSnapshot);
+        // Do something with the snapshot
+    })
+})
   },
 
   watched: {
