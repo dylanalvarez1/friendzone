@@ -82,7 +82,8 @@ export default {
       owner: undefined,
       params: "",
       group_status:"join group",
-      dialog: null
+      dialog: null,
+      authorization: null,
     }
   },
   components: {
@@ -186,13 +187,11 @@ export default {
     goToFollowedPage: function(name) {
       this.$router.push({ path: `/home/${name}` });
     },
-    customizeGroupProfile: function(groupName) {
-      let authorization = "member";
-      if(authorization === "admin") {
-        alert("You can customize this profile");
-      }
-      else {
-        alert("You cannot edit this profile, this also means you shouldnt see this");
+    customizeGroupProfile: function(groupID) {
+      if(this.authorization==="owner"||this.authorization==="admin"){
+        this.$router.push({ path: `/group-registration/${groupID}` });
+      }else{
+        alert("You don't have the authorization to customize this group");
       }
     },
     getGroup: function() {
@@ -266,6 +265,15 @@ export default {
               firebase.database().ref('/users/' + tempId).once('value').then((snapshot) => {
               this.admins.push(snapshot.val());
               });
+            }).then(()=>{
+              if(this.owner===firebase.auth().currentUser.uid){
+                this.authorization="owner";
+              }
+              else if(this.admins.includes(firebase.auth().currentUser.uid)){
+                this.authorization="admin";
+              }else{
+                this.authorization="member";
+              }
             });
             //console.log("end of big statement");
 
