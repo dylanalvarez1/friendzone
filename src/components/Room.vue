@@ -6,7 +6,7 @@
   <div id="furniture-container" class="item2"></div>
 
   <!--Toolbar-->
-  <div id="decorator" style="text-align:center" class="item3">Decorate:
+  <div  v-if="moderator || member" id="decorator" style="text-align:center" class="item3">Decorate:
     <button @click="createFurniture">Add furniture</button>
     <!--button @click="enterRoomModify">Modify room</button-->
   </div>
@@ -24,7 +24,7 @@
       <label>Padding</label><input type="number" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" min="0" max="100" v-model="mod.new.padding"><br><br>
       <label>Width</label><input type="text" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.width">
       <label>Height</label><input type="text" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.height"><br><br>
-      <button @click="deleteFurniture" style="background-color: red; color: ; font-weight: bold;">Delete furniture</button><br><br>
+      <button v-if="moderator" @click="deleteFurniture" style="background-color: red; color: ; font-weight: bold;">Delete furniture</button><br><br>
     </form>
   </div>
 
@@ -45,8 +45,10 @@
 
 <script>
 import firebase from 'firebase'
+//import functions from 'firebase-functions'
 
 const GROUP_ID = "4f71f44b-dca2-4997-bf13-311459912f25";
+const functions = console.log(firebase);
 
 export default {
   name: 'room',
@@ -75,6 +77,8 @@ export default {
          "friends": []
        },*/
       params: undefined,
+      moderator: false,
+      member: false,
       furniture: [],
       DEFAULT_FURNITURE: {
         title: "Welcome!",
@@ -398,6 +402,36 @@ export default {
       for (let i = 0; i < elmnts.length; i++)
         this.dragElement(elmnts[i]);
       if (callback) callback();
+    },
+    checkCred(uid) {
+       console.log("checking credentials of: ", uid);
+       firebase.database().ref('/rooms/' + this.$route.params.ownerID).once('value').then((snapshot) => {
+        let response = snapshot.val();
+        if(response.group == true) {
+          firebase.database().ref('/groups/' + this.$route.params.ownerID).once('value').then((snapshot2) => {
+            console.log("response:", response);
+            let newResponse = snapshot2.val()
+            let tempArray = newResponse.moderators;
+            let tempArray2 = newResponse.members;
+            console.log("temp array:", tempArray);
+            tempArray.forEach(user => {
+              if(user == firebase.auth().currentUser.uid) {
+                this.moderator = true;
+              }
+            });
+            tempArray2.forEach(user => {
+              if(user == firebase.auth().currentUser.uid) {
+                this.member = true;
+              }
+            });
+          });
+        }
+        else { //This is a user room
+          if(this.$route.params.ownerID == firebase.auth().currentUser.uid) {
+            this.moderator = true;
+          }
+        }
+      });
     }
 
   },
@@ -405,8 +439,7 @@ export default {
 
     // this.getUser();
     this.populateRoom();
-
-    console.log("props: ", this.username);
+    this.checkCred(firebase.auth().currentUser.uid);
   },
 
   watched: {
