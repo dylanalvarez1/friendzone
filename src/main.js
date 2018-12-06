@@ -4,7 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import firebase from 'firebase'
+import A11yDialog from 'vue-a11y-dialog'
 
+Vue.use(A11yDialog)
 Vue.config.productionTip = false
 
 // Initialize Firebase
