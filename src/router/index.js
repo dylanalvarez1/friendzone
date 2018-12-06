@@ -9,6 +9,7 @@ import SignUp from '@/components/SignUp'
 import UserProfile from '@/components/UserProfile'
 import GroupProfile from '@/components/GroupProfile'
 import RoomComponent from '@/components/Room'
+import AdminComponent from '@/components/AdminPage'
 import firebase from 'firebase'
 
 Vue.use(Router)
@@ -84,6 +85,14 @@ let router = new Router({
       meta: {
         requiresAuth: true
       },
+    },
+    {
+      path: '/admin/',
+      name: 'admin',
+      component: AdminComponent,
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
 })

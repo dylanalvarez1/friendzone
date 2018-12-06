@@ -5,6 +5,7 @@
     <li style="float:right" @click="toExplore"><a>Explore</a></li>
     <li style="float:right" @click="toProfile"><a>Profile</a></li>
     <li style="float:right" @click="toRoom"><a>My Room</a></li>
+    <li v-if="admin" style="float:right" @click="toAdmin"><a>Manage</a></li>
   </ul>
 </div>
 </template>
@@ -16,7 +17,7 @@ import firebase from 'firebase'
     name: 'NavBar',
     data: function() {
       return {
-
+        admin: false,
       }
     },
     methods: {
@@ -34,17 +35,35 @@ import firebase from 'firebase'
         console.log("To room!");
         this.$router.push({ path: `/room/${firebase.auth().currentUser.uid}` });
       },
+      toAdmin: function() {
+        console.log("To admin!");
+        this.$router.push({ path: `/admin/` });
+      },
       toExplore: function() {
         console.log("To explore!");
         this.$router.push({ path: `/explore` });
       },
       toGroup: function() {
         this.$router.push({ path: `/group` });
-      }
+      },
+
+      getUserById: function(userId) {
+        firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
+          let response = snapshot.val();
+          console.log(snapshot.val());
+
+          if(response.admin) {
+            this.admin = true;
+          }
+
+
+        });
+
+    },
 
     },
     mounted: function() {
-
+      this.getUserById(firebase.auth().currentUser.uid);
     }
 
   }
