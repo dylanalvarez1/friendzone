@@ -24,7 +24,7 @@
       <label>Padding</label><input type="number" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" min="0" max="100" v-model="mod.new.padding"><br><br>
       <label>Width</label><input type="text" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.width">
       <label>Height</label><input type="text" @input="saveFurnitureModifications" @change="saveFurnitureModifications" v-on:blur="saveFurnitureModifications" v-model="mod.new.height"><br><br>
-      <button @click="deleteFurniture" style="background-color: red; color: ; font-weight: bold;">Delete furniture</button><br><br>
+      <button v-if="moderator" @click="deleteFurniture" style="background-color: red; color: ; font-weight: bold;">Delete furniture</button><br><br>
     </form>
   </div>
 
@@ -77,6 +77,7 @@ export default {
          "friends": []
        },*/
       params: undefined,
+      moderator: false,
       furniture: [],
       DEFAULT_FURNITURE: {
         title: "Welcome!",
@@ -400,6 +401,21 @@ export default {
       for (let i = 0; i < elmnts.length; i++)
         this.dragElement(elmnts[i]);
       if (callback) callback();
+    },
+    checkCred(uid) {
+       console.log("checking credentials of: ", uid);
+       firebase.database().ref('/groups/' + this.$route.params.ownerID).once('value').then((snapshot) => {
+        let response = snapshot.val();
+        console.log("response:", response);
+        let tempArray = response.moderators;
+        console.log("temp array:", tempArray);
+        tempArray.forEach(user => {
+          if(user == firebase.auth().currentUser.uid) {
+            this.moderator = true;
+          }
+
+        });
+      });
     }
 
   },
@@ -407,16 +423,7 @@ export default {
 
     // this.getUser();
     this.populateRoom();
-    functions.database.ref('/room/')
-    .onWrite(event => {
-     const getSomethingPromise = admin.database().ref(`/rooms/`).once('value');
-
-     return getSomethingPromise.then(results => {
-        const somethingSnapshot = results[0];
-        console.log("update happened: ", somethingSnapshot);
-        // Do something with the snapshot
-    })
-})
+    this.checkCred(firebase.auth().currentUser.uid);
   },
 
   watched: {
