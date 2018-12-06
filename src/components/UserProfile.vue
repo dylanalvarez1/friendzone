@@ -296,7 +296,9 @@
 
   .container {
     position: relative;
-
+    cursor: pointer;
+     width: 100%;
+  max-width: 100px;
   }
 
   .image {

@@ -281,7 +281,9 @@ export default {
 
   .container {
     position: relative;
-    width: 5%;
+    cursor: pointer;
+     width: 100%;
+  max-width: 100px;
   }
 
   .image {
